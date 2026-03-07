@@ -241,11 +241,8 @@ if (redirectMsg) {
   sessionStorage.removeItem('atom_redirect_msg');
 }
 
-// If already logged in with valid role, redirect straight to their panel
-const savedRole = sessionStorage.getItem('atom_role');
-if (savedRole && USERS[savedRole]) {
-  window.location.href = USERS[savedRole].url;
-}
+// Don't auto-redirect - let user login fresh
+// (auto-redirect removed to prevent loop after logout)
 </script>
 </body>
 </html>
