@@ -149,11 +149,11 @@ body::before{content:'';position:fixed;inset:0;
 
       <div class="field">
         <label class="field-label">Kullanıcı Adı</label>
-        <input class="field-input" id="username" type="text" placeholder="kullanici.adi" autocomplete="username">
+        <input class="field-input" id="username" type="text" placeholder="kullanici.adi" autocomplete="username" oninput="checkAutoLogin()">
       </div>
       <div class="field">
         <label class="field-label">Şifre</label>
-        <input class="field-input" id="password" type="password" placeholder="••••••••" autocomplete="current-password">
+        <input class="field-input" id="password" type="password" placeholder="••••••••" autocomplete="current-password" oninput="checkAutoLogin()">
       </div>
 
       <button class="login-btn" onclick="doLogin()">
@@ -243,6 +243,37 @@ if (redirectMsg) {
 
 // Don't auto-redirect - let user login fresh
 // (auto-redirect removed to prevent loop after logout)
+
+// ── AUTO LOGIN ──
+function checkAutoLogin() {
+  var u = document.getElementById('username').value.trim();
+  var p = document.getElementById('password').value;
+  if (!u || !p) return;
+  
+  // Find matching user across all roles
+  for (var role in USERS) {
+    var cred = USERS[role];
+    if (cred.user === u && cred.pass === p) {
+      // Auto select role button
+      document.querySelectorAll('.role-btn').forEach(function(b) {
+        b.classList.remove('active');
+        if (b.dataset.role === role) b.classList.add('active');
+      });
+      selectedRole = role;
+      
+      // Auto login after short delay
+      setTimeout(function() {
+        sessionStorage.setItem('atom_role', selectedRole);
+        sessionStorage.setItem('atom_user', u);
+        sessionStorage.setItem('atom_label', cred.label);
+        document.getElementById('loadingRole').textContent = cred.label + ' yükleniyor...';
+        document.getElementById('loadingOvl').classList.add('show');
+        setTimeout(function() { window.location.href = cred.url; }, 800);
+      }, 300);
+      break;
+    }
+  }
+}
 </script>
 </body>
 </html>
