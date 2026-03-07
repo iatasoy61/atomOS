@@ -232,10 +232,19 @@ function doLogin() {
 // Enter key
 document.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
 
-// Check if already logged in (back button case)
+// Check redirect message (from unauthorized access)
+const redirectMsg = sessionStorage.getItem('atom_redirect_msg');
+if (redirectMsg) {
+  const errEl = document.getElementById('errMsg');
+  errEl.textContent = redirectMsg;
+  errEl.classList.add('show');
+  sessionStorage.removeItem('atom_redirect_msg');
+}
+
+// If already logged in with valid role, redirect straight to their panel
 const savedRole = sessionStorage.getItem('atom_role');
 if (savedRole && USERS[savedRole]) {
-  // Let them re-login, don't auto redirect
+  window.location.href = USERS[savedRole].url;
 }
 </script>
 </body>

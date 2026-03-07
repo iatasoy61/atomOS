@@ -1,6 +1,20 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
+<script>
+(function(){
+  var role = sessionStorage.getItem('atom_role');
+  var user = sessionStorage.getItem('atom_user');
+  var ALLOWED_ROLES = ['patron', 'admin'];
+  var ALLOWED_USERS = ['patron', 'admin'];
+  if(!role || ALLOWED_ROLES.indexOf(role) === -1) {
+    // Not logged in or wrong role
+    sessionStorage.setItem('atom_redirect_msg', 'Bu sayfaya erişmek için 👑 Patron Ekranı girişi yapmalısınız.');
+    window.location.replace('ops-login.html');
+  }
+})();
+</script>
+
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>ATOM OPS · Patron</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Syne:wght@400;600;700;800&family=Figtree:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -419,7 +433,7 @@ body::before{content:'';position:fixed;width:800px;height:400px;border-radius:50
     </div>
     <button class="fr-submit" onclick="submitFeature()">📤 Talebi Gönder · WhatsApp & E-posta Bilgilendirme Al</button>
     <div style="margin-top:12px;padding:10px 14px;background:var(--gold-dim);border:1px solid rgba(212,175,55,.15);border-radius:9px;font-size:11px;color:var(--m2)">
-      ✉️ <strong style="color:var(--gold)">info@atomops.com</strong> · 📱 <strong style="color:var(--gold)">+90 (535) 977 72 75</strong>
+      ✉️ <strong style="color:var(--gold)"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="543d3a323b1435203b393b24277a373b39">[email&#160;protected]</a></strong> · 📱 <strong style="color:var(--gold)">+90 (535) 977 72 75</strong>
     </div>
   </div>
 
@@ -436,7 +450,14 @@ body::before{content:'';position:fixed;width:800px;height:400px;border-radius:50
 
 <div class="toast" id="toastEl"></div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js">
+function atomLogout() {
+  sessionStorage.removeItem('atom_role');
+  sessionStorage.removeItem('atom_user');
+  sessionStorage.removeItem('atom_label');
+  window.location.href = 'ops-login.html';
+}
+</script><script>
 // ── DATA ──
 const PERIODS = {
   gunluk:  {ciro:'₺18.4K',kar:'₺4.4K',siparis:247,doluluk:'68%',marj:'%24'},
@@ -828,8 +849,4 @@ function toast(msg){const t=document.getElementById('toastEl');t.textContent=msg
 setInterval(()=>{document.getElementById('clk').textContent=new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});},1000);
 
 // ── INIT ──
-renderKPI(); renderHourly(); renderDonut(); renderOccupancy(); renderTopProducts(); renderLiveStatus();
-renderPL(); renderCiro(); renderOverhead(); renderHeatmap(); renderInsights(); renderFRHistory();
-</script>
-</body>
-</html>
+r

@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
+<script>
+(function(){
+  var role = sessionStorage.getItem('atom_role');
+  if(!role || ['admin','super'].indexOf(role) === -1) {
+    window.location.replace('ops-login.html');
+  }
+})();
+</script>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ATOM OPS · Admin</title>
@@ -10,107 +19,82 @@
   --red:#E8390E;--red-dim:rgba(232,57,14,.12);--red-border:rgba(232,57,14,.25);
   --bg:#07080A;--s1:#0F1114;--s2:#141720;--border:rgba(255,255,255,.07);
   --text:#E8EAF0;--muted:#4A5060;--green:#22C55E;--amber:#F59E0B;--blue:#3B82F6;
-  --font:'Figtree',sans-serif;--mono:'IBM Plex Mono',monospace;
+  --font:"Figtree",sans-serif;--mono:"IBM Plex Mono",monospace;
 }
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;overflow:hidden}
-a{color:inherit;text-decoration:none}
-
-/* ── LAYOUT ── */
+/* LOGIN */
+#loginOverlay{position:fixed;inset:0;z-index:9999;background:#07080A;display:flex;align-items:center;justify-content:center;transition:opacity .3s}
+.login-box{background:var(--s1);border:1px solid rgba(255,255,255,.1);border-radius:24px;padding:40px;width:100%;max-width:400px;box-shadow:0 40px 80px rgba(0,0,0,.6)}
+.login-logo{width:52px;height:52px;background:var(--red);border-radius:14px;display:flex;align-items:center;justify-content:center;font-family:"Cormorant Garamond";font-size:26px;font-weight:700;color:#fff;margin:0 auto 20px}
+.login-title{text-align:center;font-size:22px;font-weight:900;margin-bottom:4px}
+.login-sub{text-align:center;font-size:12px;color:var(--muted);margin-bottom:28px}
+.login-label{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;display:block}
+.login-input{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:11px;padding:13px 16px;color:var(--text);font-family:var(--font);font-size:13px;outline:none;transition:.2s;margin-bottom:12px}
+.login-input:focus{border-color:rgba(232,57,14,.4);background:rgba(232,57,14,.04)}
+.login-btn{width:100%;padding:14px;border:none;border-radius:11px;background:var(--red);color:#fff;font-family:var(--font);font-size:14px;font-weight:800;cursor:pointer;margin-top:4px;box-shadow:0 4px 20px rgba(232,57,14,.35)}
+.login-btn:hover{background:#ff4d1a}
+.login-error{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:9px;padding:10px 14px;font-size:12px;color:#FCA5A5;margin-top:12px;display:none;text-align:center}
+.login-hint{text-align:center;font-size:11px;color:var(--muted);margin-top:16px}
+.login-hint span{color:var(--red);font-weight:700}
+/* LAYOUT */
 .shell{display:flex;height:100vh;overflow:hidden}
-
-/* ── SIDEBAR ── */
-.sidebar{width:220px;flex-shrink:0;background:var(--s1);border-right:1px solid var(--border);
-  display:flex;flex-direction:column;overflow-y:auto;scrollbar-width:none}
+/* SIDEBAR */
+.sidebar{width:220px;flex-shrink:0;background:var(--s1);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;scrollbar-width:none}
 .sidebar::-webkit-scrollbar{display:none}
-
 .sb-head{padding:18px 16px 14px;border-bottom:1px solid var(--border)}
 .sb-brand{display:flex;align-items:center;gap:10px;margin-bottom:4px}
-.sb-logo{width:34px;height:34px;background:var(--red);border-radius:10px;
-  display:flex;align-items:center;justify-content:center;
-  font-family:'Cormorant Garamond';font-size:18px;font-weight:700;color:#fff}
+.sb-logo{width:34px;height:34px;background:var(--red);border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:"Cormorant Garamond";font-size:18px;font-weight:700;color:#fff}
 .sb-name{font-size:13px;font-weight:800;line-height:1.2}
-.sb-role{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
-  padding:3px 9px;border-radius:5px;background:var(--red-dim);color:var(--red);
-  display:inline-block;margin-top:6px}
-
+.sb-role{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:3px 9px;border-radius:5px;background:var(--red-dim);color:var(--red);display:inline-block;margin-top:6px}
 .sb-nav{flex:1;padding:10px 8px}
-.sb-section{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
-  color:var(--muted);padding:10px 8px 5px}
-.sb-item{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:9px;
-  margin-bottom:2px;cursor:pointer;font-size:12px;font-weight:500;color:var(--muted);
-  transition:all .15s;border:1px solid transparent}
+.sb-section{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);padding:10px 8px 5px}
+.sb-item{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:9px;margin-bottom:2px;cursor:pointer;font-size:12px;font-weight:500;color:var(--muted);transition:all .15s;border:1px solid transparent}
 .sb-item:hover{background:rgba(255,255,255,.04);color:var(--text)}
 .sb-item.active{background:var(--red-dim);border-color:var(--red-border);color:#fff;font-weight:700}
 .sb-item .ico{width:16px;text-align:center;font-size:13px;flex-shrink:0}
-.sb-badge{margin-left:auto;min-width:18px;height:18px;border-radius:4px;
-  background:#E53E3E;color:#fff;font-size:9px;font-weight:700;
-  display:flex;align-items:center;justify-content:center;padding:0 4px}
-
 .sb-foot{padding:12px 16px;border-top:1px solid var(--border)}
 .sb-user{display:flex;align-items:center;gap:9px}
-.sb-avatar{width:32px;height:32px;border-radius:50%;background:var(--red-dim);
-  border:1px solid var(--red-border);display:flex;align-items:center;justify-content:center;
-  font-size:13px;font-weight:700;color:var(--red);flex-shrink:0}
+.sb-avatar{width:32px;height:32px;border-radius:50%;background:var(--red-dim);border:1px solid var(--red-border);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--red);flex-shrink:0}
 .sb-uname{font-size:12px;font-weight:600}
 .sb-uemail{font-size:10px;color:var(--muted)}
-.logout-btn{margin-left:auto;background:transparent;border:none;color:var(--muted);
-  cursor:pointer;font-size:16px;transition:.15s;padding:4px}
-.logout-btn:hover{color:var(--text)}
-
-/* ── MAIN ── */
+.sb-logout{margin-left:auto;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.15);color:#FCA5A5;cursor:pointer;font-size:11px;font-weight:700;font-family:var(--font);padding:5px 9px;border-radius:7px;transition:.15s}
+.sb-logout:hover{background:rgba(239,68,68,.2);color:#fff}
+/* MAIN */
 .main{flex:1;overflow-y:auto;display:flex;flex-direction:column}
-
-/* ── TOPBAR ── */
-.topbar{position:sticky;top:0;z-index:50;background:rgba(7,8,10,.9);backdrop-filter:blur(20px);
-  border-bottom:1px solid var(--border);padding:0 24px;height:52px;
-  display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.topbar{position:sticky;top:0;z-index:50;background:rgba(7,8,10,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 24px;height:52px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
 .tb-title{font-size:15px;font-weight:800}
-.tb-right{display:flex;align-items:center;gap:12px}
+.tb-right{display:flex;align-items:center;gap:10px}
 .tb-clock{font-family:var(--mono);font-size:12px;color:var(--muted)}
-.notif-btn{position:relative;width:34px;height:34px;border-radius:9px;
-  background:rgba(255,255,255,.05);border:1px solid var(--border);
-  display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px}
-.notif-dot{position:absolute;top:6px;right:6px;width:7px;height:7px;
-  border-radius:50%;background:var(--red);border:2px solid var(--bg)}
-
-/* ── PANELS ── */
+.notif-btn{position:relative;width:34px;height:34px;border-radius:9px;background:rgba(255,255,255,.05);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px}
+.notif-dot{position:absolute;top:6px;right:6px;width:7px;height:7px;border-radius:50%;background:var(--red);border:2px solid var(--bg)}
+.tb-logout{padding:6px 14px;border-radius:8px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);color:#FCA5A5;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font)}
+.tb-logout:hover{background:rgba(239,68,68,.18);color:#fff}
+/* PANELS */
 .panel{display:none;padding:24px;flex-direction:column;gap:20px;animation:fadeIn .2s ease}
 .panel.active{display:flex}
 @keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
-
-/* ── COMMON ── */
 .pg-head{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px}
 .pg-title h2{font-size:18px;font-weight:900;letter-spacing:-.3px}
 .pg-title p{font-size:12px;color:var(--muted);margin-top:3px}
 .btn-row{display:flex;gap:8px;flex-wrap:wrap}
-
-.btn{padding:8px 16px;border-radius:9px;border:1px solid var(--border);background:transparent;
-  color:#94A3B8;font-size:12px;font-weight:600;cursor:pointer;transition:.15s;
-  font-family:var(--font);display:flex;align-items:center;gap:6px}
+.btn{padding:8px 16px;border-radius:9px;border:1px solid var(--border);background:transparent;color:#94A3B8;font-size:12px;font-weight:600;cursor:pointer;transition:.15s;font-family:var(--font);display:flex;align-items:center;gap:6px}
 .btn:hover{background:rgba(255,255,255,.06);color:var(--text);border-color:rgba(255,255,255,.15)}
 .btn.primary{background:var(--red);border-color:var(--red);color:#fff;box-shadow:0 4px 16px rgba(232,57,14,.3)}
 .btn.primary:hover{background:#ff4d1a}
 .btn.success{background:rgba(34,197,94,.1);border-color:rgba(34,197,94,.2);color:#4ADE80}
 .btn.danger{background:rgba(239,68,68,.08);border-color:rgba(239,68,68,.15);color:#FCA5A5}
-
-/* Card */
 .card{background:var(--s1);border:1px solid var(--border);border-radius:16px;overflow:hidden}
-.card-head{padding:16px 20px;border-bottom:1px solid var(--border);
-  display:flex;align-items:center;justify-content:space-between;gap:10px}
+.card-head{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px}
 .card-head h3{font-size:13px;font-weight:700}
 .card-body{padding:20px}
-
-/* ── USERS TABLE ── */
+/* USERS */
 .users-table{width:100%;border-collapse:collapse}
-.users-table th{padding:9px 14px;font-size:10px;font-weight:700;letter-spacing:1px;
-  text-transform:uppercase;color:var(--muted);text-align:left;
-  border-bottom:1px solid var(--border);background:var(--s2)}
+.users-table th{padding:9px 14px;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);text-align:left;border-bottom:1px solid var(--border);background:var(--s2)}
 .users-table td{padding:12px 14px;font-size:13px;border-bottom:1px solid var(--border)}
 .users-table tr:last-child td{border:none}
 .users-table tr:hover td{background:rgba(255,255,255,.02)}
-.role-tag{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;
-  border-radius:6px;font-size:11px;font-weight:700;letter-spacing:.3px}
+.role-tag{display:inline-flex;align-items:center;padding:3px 10px;border-radius:6px;font-size:11px;font-weight:700}
 .rt-admin{background:rgba(232,57,14,.12);color:var(--red)}
 .rt-patron{background:rgba(250,204,21,.1);color:#FACC15}
 .rt-super{background:rgba(59,130,246,.1);color:#93C5FD}
@@ -118,285 +102,341 @@ a{color:inherit;text-decoration:none}
 .rt-waiter{background:rgba(34,197,94,.1);color:#86EFAC}
 .rt-valet{background:rgba(139,92,246,.1);color:#C4B5FD}
 .status-dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px}
-.sd-on{background:var(--green)}
-.sd-off{background:var(--muted)}
+.sd-on{background:var(--green)}.sd-off{background:var(--muted)}
 .action-btns{display:flex;gap:6px}
-.act{padding:4px 9px;border-radius:6px;border:1px solid var(--border);background:transparent;
-  color:var(--muted);font-size:11px;cursor:pointer;transition:.15s;font-family:var(--font)}
+.act{padding:4px 9px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:11px;cursor:pointer;transition:.15s;font-family:var(--font)}
 .act:hover{background:rgba(255,255,255,.06);color:var(--text)}
 .act.del:hover{background:rgba(239,68,68,.1);color:#FCA5A5;border-color:rgba(239,68,68,.2)}
-
-/* ── MENU GRID ── */
-.menu-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+/* MENU */
+.menu-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
 .menu-card{background:var(--s1);border:1px solid var(--border);border-radius:14px;overflow:hidden;transition:.2s}
 .menu-card:hover{border-color:rgba(255,255,255,.14)}
 .mc-img{height:130px;overflow:hidden;position:relative}
 .mc-img img{width:100%;height:100%;object-fit:cover;display:block;transition:.3s}
 .mc-img:hover img{transform:scale(1.05)}
-.mc-badge{position:absolute;top:10px;left:10px;padding:3px 8px;border-radius:5px;
-  font-size:10px;font-weight:700;background:rgba(0,0,0,.7);backdrop-filter:blur(4px)}
+.mc-badge{position:absolute;top:10px;left:10px;padding:3px 8px;border-radius:5px;font-size:10px;font-weight:700;background:rgba(0,0,0,.75)}
 .mc-body{padding:14px}
 .mc-name{font-size:14px;font-weight:700;margin-bottom:2px}
 .mc-cat{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px}
 .mc-foot{display:flex;align-items:center;justify-content:space-between}
-.mc-price{font-family:var(--mono);font-size:16px;font-weight:600;cursor:pointer;
-  border-bottom:1px dashed rgba(255,255,255,.2);transition:.15s}
-.mc-price:hover{color:var(--blue);border-color:var(--blue)}
+.mc-price{font-family:var(--mono);font-size:16px;font-weight:600;cursor:pointer;border-bottom:1px dashed rgba(255,255,255,.2);transition:.15s}
+.mc-price:hover{color:var(--blue)}
 .mc-toggle{display:flex;align-items:center;gap:7px;cursor:pointer}
 .tog{width:36px;height:20px;border-radius:10px;position:relative;transition:.25s;flex-shrink:0;border:none;cursor:pointer}
 .tog.on{background:var(--green)}.tog.off{background:#374151}
-.tog::after{content:'';position:absolute;width:16px;height:16px;background:#fff;border-radius:50%;top:2px;transition:.25s}
+.tog::after{content:"";position:absolute;width:16px;height:16px;background:#fff;border-radius:50%;top:2px;transition:.25s}
 .tog.on::after{left:18px}.tog.off::after{left:2px}
-
-/* ── INTEGRATIONS ── */
+/* INTEGRATIONS */
 .int-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
 .int-card{background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:18px}
 .int-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
-.int-name{font-size:14px;font-weight:700;display:flex;align-items:center;gap:8px}
-.int-status{font-size:11px;font-weight:600;display:flex;align-items:center;gap:5px}
+.int-name{font-size:14px;font-weight:700}
+.int-status{font-size:11px;font-weight:600}
 .conn{color:var(--green)}.disconn{color:#EF4444}
-.field-mini{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--border);
-  border-radius:9px;padding:9px 12px;color:var(--text);font-family:var(--mono);
-  font-size:11px;margin-bottom:8px;outline:none;transition:.15s}
-.field-mini:focus{border-color:rgba(59,130,246,.4)}
+.field-mini{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:9px;padding:9px 12px;color:var(--text);font-family:var(--mono);font-size:11px;margin-bottom:8px;outline:none}
 .int-actions{display:flex;gap:7px;margin-top:12px}
-.int-btn{flex:1;padding:8px;border-radius:8px;border:none;font-family:var(--font);
-  font-size:11px;font-weight:700;cursor:pointer;transition:.15s}
+.int-btn{flex:1;padding:8px;border-radius:8px;border:none;font-family:var(--font);font-size:11px;font-weight:700;cursor:pointer}
 .ib-conn{background:var(--blue);color:#fff}
 .ib-sync{background:rgba(59,130,246,.1);color:#93C5FD;border:1px solid rgba(59,130,246,.2)}
 .ib-test{background:rgba(255,255,255,.05);color:var(--muted);border:1px solid var(--border)}
 .ib-disc{background:rgba(239,68,68,.08);color:#FCA5A5;border:1px solid rgba(239,68,68,.15)}
-
-/* ── TABLES/QR ── */
-.masa-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}
-.masa-card{background:var(--s1);border:1px solid var(--border);border-radius:14px;
-  padding:18px;text-align:center;transition:.2s;cursor:pointer}
+/* MASA */
+.masa-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px}
+.masa-card{background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:16px;text-align:center;transition:.2s;cursor:pointer}
 .masa-card:hover{border-color:rgba(255,255,255,.15)}
 .masa-card.dolu{border-color:rgba(232,57,14,.3);background:rgba(232,57,14,.04)}
 .masa-card.bos{border-color:rgba(34,197,94,.2);background:rgba(34,197,94,.03)}
-.masa-no{font-family:'Cormorant Garamond';font-size:32px;font-weight:700;margin-bottom:6px}
+.masa-no{font-family:"Cormorant Garamond";font-size:30px;font-weight:700;margin-bottom:4px}
 .masa-name{font-size:11px;font-weight:600;margin-bottom:8px}
 .masa-status{font-size:10px;font-weight:700;padding:3px 10px;border-radius:5px;display:inline-block}
 .ms-dolu{background:rgba(232,57,14,.15);color:var(--red)}
 .ms-bos{background:rgba(34,197,94,.1);color:#4ADE80}
-.masa-qr{margin-top:10px}
-.qr-btn{padding:5px 12px;border-radius:7px;border:1px solid var(--border);background:transparent;
-  color:var(--muted);font-size:11px;cursor:pointer;font-family:var(--font);transition:.15s}
+.masa-qr{margin-top:8px;display:flex;gap:4px;justify-content:center;flex-wrap:wrap}
+.qr-btn{padding:4px 9px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:10px;cursor:pointer;font-family:var(--font)}
 .qr-btn:hover{color:var(--text);border-color:rgba(255,255,255,.2)}
-
-/* ── REPORTS ── */
+/* REPORTS */
 .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
 .stat-card{background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:16px;position:relative;overflow:hidden}
-.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.stat-card::before{content:"";position:absolute;top:0;left:0;right:0;height:2px}
 .sc-r::before{background:var(--red)}.sc-g::before{background:var(--green)}
 .sc-b::before{background:var(--blue)}.sc-a::before{background:var(--amber)}
 .s-lbl{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
 .s-val{font-family:var(--mono);font-size:24px;font-weight:600;margin-bottom:3px}
 .s-delta{font-size:11px;color:var(--muted)}
 .sv-r{color:#FF6B3D}.sv-g{color:#4ADE80}.sv-b{color:#93C5FD}.sv-a{color:#FCD34D}
-
-/* ── MODAL ── */
-.modal-bg{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);
-  display:none;align-items:center;justify-content:center;padding:20px}
+/* MODAL */
+.modal-bg{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:20px}
 .modal-bg.open{display:flex}
-.modal{background:#13161E;border:1px solid rgba(255,255,255,.1);border-radius:20px;
-  width:100%;max-width:520px;max-height:85vh;overflow-y:auto}
-.modal-head{padding:18px 22px;border-bottom:1px solid var(--border);
-  display:flex;align-items:center;justify-content:space-between;
-  position:sticky;top:0;background:#13161E;z-index:1}
+.modal{background:#13161E;border:1px solid rgba(255,255,255,.1);border-radius:20px;width:100%;max-width:520px;max-height:85vh;overflow-y:auto}
+.modal-head{padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#13161E;z-index:1}
 .modal-head h3{font-size:15px;font-weight:800}
-.modal-x{width:30px;height:30px;border-radius:8px;border:none;
-  background:rgba(255,255,255,.06);color:var(--text);font-size:15px;cursor:pointer;
-  display:flex;align-items:center;justify-content:center}
+.modal-x{width:30px;height:30px;border-radius:8px;border:none;background:rgba(255,255,255,.06);color:var(--text);font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center}
 .modal-body{padding:22px;display:flex;flex-direction:column;gap:14px}
 .form-row{display:flex;flex-direction:column;gap:5px}
 .form-label{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted)}
-.form-input{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;
-  padding:11px 14px;color:var(--text);font-family:var(--font);font-size:13px;outline:none;transition:.2s;width:100%}
+.form-input{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;padding:11px 14px;color:var(--text);font-family:var(--font);font-size:13px;outline:none;transition:.2s;width:100%}
 .form-input:focus{border-color:rgba(59,130,246,.4)}
 .form-row-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .modal-foot{padding:0 22px 22px;display:flex;gap:8px}
-.modal-save{flex:1;padding:12px;border:none;border-radius:11px;background:var(--blue);
-  color:#fff;font-family:var(--font);font-size:13px;font-weight:700;cursor:pointer}
-.modal-cancel{padding:12px 18px;border:1px solid var(--border);border-radius:11px;
-  background:transparent;color:var(--muted);font-family:var(--font);font-size:13px;cursor:pointer}
-
-/* Permission grid */
+.modal-save{flex:1;padding:12px;border:none;border-radius:11px;background:var(--blue);color:#fff;font-family:var(--font);font-size:13px;font-weight:700;cursor:pointer}
+.modal-cancel{padding:12px 18px;border:1px solid var(--border);border-radius:11px;background:transparent;color:var(--muted);font-family:var(--font);font-size:13px;cursor:pointer}
 .perm-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.perm-item{display:flex;align-items:center;gap:9px;padding:10px;
-  background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:9px;cursor:pointer}
-.perm-check{width:18px;height:18px;border-radius:4px;border:1px solid var(--border);
-  background:transparent;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px}
+.perm-item{display:flex;align-items:center;gap:9px;padding:10px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:9px;cursor:pointer}
+.perm-check{width:18px;height:18px;border-radius:4px;border:1px solid var(--border);background:transparent;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px}
 .perm-check.checked{background:var(--blue);border-color:var(--blue)}
 .perm-name{font-size:11px;font-weight:600}
-
-/* Toast */
-.toast{position:fixed;bottom:24px;right:24px;z-index:999;
-  background:var(--s2);border:1px solid rgba(255,255,255,.1);border-radius:11px;
-  padding:12px 18px;font-size:13px;opacity:0;transform:translateY(6px);
-  transition:.25s;pointer-events:none;max-width:300px;box-shadow:0 8px 32px rgba(0,0,0,.4)}
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;z-index:9998;background:var(--s2);border:1px solid rgba(255,255,255,.12);border-radius:11px;padding:12px 18px;font-size:13px;opacity:0;transform:translateY(6px);transition:.25s;pointer-events:none;max-width:320px;box-shadow:0 8px 32px rgba(0,0,0,.4)}
 .toast.show{opacity:1;transform:translateY(0)}
-
-/* Scrollbar */
+/* SCREENS */
+.screen-kiosk{width:250px;height:440px;border-radius:18px;border:6px solid #1a1f2e;background:#000;overflow:hidden;box-shadow:0 16px 48px rgba(0,0,0,.6);position:relative}
+.screen-tv{width:460px;height:260px;border-radius:10px;border:8px solid #1a1f2e;background:#000;overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,.6);position:relative}
+.screen-badge{position:absolute;top:8px;right:8px;font-size:9px;font-weight:700;padding:3px 8px;border-radius:5px;z-index:10}
+.sb-live{background:rgba(34,197,94,.2);color:#4ADE80;border:1px solid rgba(34,197,94,.3)}
+.screen-row{display:grid;grid-template-columns:auto 1fr;gap:24px;align-items:start}
+.screen-controls{flex:1}
+.ctrl-section{margin-bottom:18px}
+.ctrl-title{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:7px}
+.ctrl-title::after{content:"";flex:1;height:1px;background:var(--border)}
+.tog-row{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;margin-bottom:7px}
+.tog-row:hover{border-color:rgba(255,255,255,.12)}
+.tog-label{font-size:12px;font-weight:600}
+.tog-sub{font-size:10px;color:var(--muted);margin-top:1px}
+.sw{width:38px;height:21px;border-radius:11px;position:relative;transition:.25s;flex-shrink:0;border:none;cursor:pointer;outline:none}
+.sw.on{background:var(--green)}.sw.off{background:#2D3748}
+.sw::after{content:"";position:absolute;width:17px;height:17px;background:#fff;border-radius:50%;top:2px;transition:.25s;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.sw.on::after{left:19px}.sw.off::after{left:2px}
+.screen-status-bar{display:flex;gap:10px;flex-wrap:wrap}
+.ssb-item{display:flex;align-items:center;gap:8px;padding:8px 14px;background:var(--s1);border:1px solid var(--border);border-radius:10px;flex:1;min-width:140px}
+.ssb-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.ssb-name{font-size:12px;font-weight:700;flex:1}
+/* KIOSK PREVIEW */
+.kiosk-inner{width:100%;height:100%;background:#0a0c12;overflow:hidden;display:flex;flex-direction:column}
+.ki-header{background:var(--red);padding:10px 12px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.ki-logo{font-family:"Cormorant Garamond";font-size:14px;font-weight:700;color:#fff}
+.ki-time{font-size:9px;color:rgba(255,255,255,.7);font-family:var(--mono)}
+.ki-hero{height:76px;overflow:hidden;flex-shrink:0;position:relative}
+.ki-hero img{width:100%;height:100%;object-fit:cover;opacity:.8}
+.ki-hero-text{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;background:linear-gradient(rgba(0,0,0,.3),rgba(0,0,0,.5))}
+.ki-welcome{color:#fff;font-size:9px;font-weight:700;letter-spacing:1px;margin-bottom:2px}
+.ki-sub{color:rgba(255,255,255,.7);font-size:7px}
+.ki-cats{display:grid;grid-template-columns:1fr 1fr;gap:5px;padding:7px;flex-shrink:0}
+.ki-cat{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);border-radius:7px;padding:6px;text-align:center}
+.ki-cat-ico{font-size:14px;margin-bottom:2px}
+.ki-cat-name{font-size:6px;font-weight:700;color:rgba(255,255,255,.8)}
+.ki-items{flex:1;padding:0 7px 7px;overflow:hidden;display:flex;flex-direction:column;gap:4px}
+.ki-item{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:6px;padding:5px 7px;display:flex;align-items:center;gap:6px}
+.ki-item-img{width:28px;height:28px;border-radius:4px;object-fit:cover;flex-shrink:0}
+.ki-item-name{font-size:7px;font-weight:700;color:#fff;flex:1}
+.ki-item-price{font-size:7px;font-weight:700;color:var(--red);font-family:var(--mono)}
+.ki-footer{background:rgba(232,57,14,.9);padding:6px 12px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.ki-cart{font-size:7px;color:#fff;font-weight:700}
+.ki-order-btn{background:#fff;color:var(--red);border:none;border-radius:4px;padding:3px 8px;font-size:7px;font-weight:800;cursor:pointer}
+/* TV PREVIEW */
+.tv-inner{width:100%;height:100%;background:#080A0F;display:flex;flex-direction:column;overflow:hidden}
+.tv-ticker{background:var(--red);padding:3px 10px;font-size:8px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;flex-shrink:0}
+.tv-ticker-txt{display:inline-block;animation:ticker 16s linear infinite}
+@keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.tv-body{flex:1;display:grid;grid-template-columns:1.2fr 1fr;overflow:hidden}
+.tv-featured{position:relative;overflow:hidden}
+.tv-featured img{width:100%;height:100%;object-fit:cover;opacity:.7}
+.tv-feat-overlay{position:absolute;inset:0;background:linear-gradient(to right,rgba(0,0,0,.7),transparent);display:flex;flex-direction:column;justify-content:flex-end;padding:10px}
+.tv-feat-name{color:#fff;font-size:11px;font-weight:800;margin-bottom:2px}
+.tv-feat-desc{color:rgba(255,255,255,.6);font-size:7px;margin-bottom:5px}
+.tv-feat-price{color:var(--red);font-family:var(--mono);font-size:13px;font-weight:700}
+.tv-feat-badge{position:absolute;top:6px;left:6px;background:var(--red);color:#fff;font-size:7px;font-weight:800;padding:2px 6px;border-radius:4px}
+.tv-menu-list{padding:8px;display:flex;flex-direction:column;gap:4px;overflow:hidden}
+.tv-menu-item{display:flex;align-items:center;gap:6px;padding:4px 6px;border-radius:5px;background:rgba(255,255,255,.04)}
+.tv-mi-img{width:22px;height:22px;border-radius:4px;object-fit:cover;flex-shrink:0}
+.tv-mi-name{font-size:7px;font-weight:700;flex:1;color:#fff}
+.tv-mi-price{font-family:var(--mono);font-size:8px;font-weight:700;color:var(--amber)}
+.tv-footer{height:22px;background:rgba(0,0,0,.6);border-top:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:space-between;padding:0 8px;flex-shrink:0}
+.tv-wifi{font-size:7px;color:rgba(255,255,255,.4);font-weight:600}
+.tv-brand{font-family:"Cormorant Garamond";font-size:9px;font-weight:600;color:rgba(255,255,255,.5)}
+/* SLIDERS */
+.preview-carousel{width:100%;height:190px;border-radius:12px;overflow:hidden;position:relative;background:var(--s2);border:1px solid var(--border)}
+.pc-slide{position:absolute;inset:0;opacity:0;transition:opacity .6s}
+.pc-slide.visible{opacity:1}
+.pc-slide img{width:100%;height:100%;object-fit:cover}
+.pc-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.7),transparent);display:flex;flex-direction:column;justify-content:flex-end;padding:14px}
+.pc-name{color:#fff;font-size:15px;font-weight:800;margin-bottom:3px}
+.pc-sub{font-size:11px;color:rgba(255,255,255,.6)}
+.pc-dots{display:flex;gap:5px;position:absolute;bottom:10px;right:14px}
+.pc-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.3);cursor:pointer;transition:.2s}
+.pc-dot.on{background:#fff;width:16px;border-radius:3px}
+.pc-nav{position:absolute;top:50%;transform:translateY(-50%);width:30px;height:30px;border-radius:50%;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.15);color:#fff;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:5}
+.pc-nav:hover{background:rgba(0,0,0,.8)}
+.pc-prev{left:10px}.pc-next{right:10px}
+.sl-card{background:var(--s1);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:.2s;margin-bottom:8px}
+.sl-card:hover{border-color:rgba(255,255,255,.14)}
+.sl-card.active-sl{border-color:rgba(59,130,246,.25)}
+.sl-head{display:flex;align-items:center}
+.sl-drag{padding:12px 14px;color:var(--muted);cursor:grab;font-size:14px;user-select:none}
+.sl-thumb{width:72px;height:48px;object-fit:cover;flex-shrink:0}
+.sl-meta{flex:1;padding:8px 12px}
+.sl-name{font-size:12px;font-weight:700;margin-bottom:2px}
+.sl-detail{font-size:10px;color:var(--muted)}
+.sl-controls{padding:8px 12px;display:flex;align-items:center;gap:7px;flex-shrink:0}
+.sl-type{display:inline-flex;padding:2px 7px;border-radius:5px;font-size:9px;font-weight:700}
+.slt-promo{background:rgba(232,57,14,.12);color:var(--red)}
+.slt-product{background:rgba(59,130,246,.1);color:#93C5FD}
+.slt-event{background:rgba(139,92,246,.1);color:#C4B5FD}
+.slt-info{background:rgba(245,158,11,.1);color:#FCD34D}
+.slt-custom{background:rgba(34,197,94,.1);color:#4ADE80}
+.upload-zone{border:2px dashed rgba(255,255,255,.12);border-radius:12px;padding:22px;text-align:center;cursor:pointer;transition:.2s;background:rgba(255,255,255,.02);background-size:cover;background-position:center;min-height:90px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.upload-zone:hover,.upload-zone.drag-over{border-color:rgba(59,130,246,.4);background-color:rgba(59,130,246,.04)}
 ::-webkit-scrollbar{width:5px;height:5px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:3px}
 </style>
 </head>
 <body>
-
-<div class="shell">
-
-<!-- SIDEBAR -->
+<!-- LOGIN -->
+<div id="loginOverlay">
+  <div class="login-box">
+    <div class="login-logo">A</div>
+    <div class="login-title">ATOM OPS</div>
+    <div class="login-sub">Administrator Paneli · ops.atomkumpir.com</div>
+    <label class="login-label">Kullanıcı Adı</label>
+    <input class="login-input" id="loginUser" placeholder="admin" onkeydown="if(event.key==='Enter')doLogin()">
+    <label class="login-label">Şifre</label>
+    <input class="login-input" id="loginPass" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="login-btn" onclick="doLogin()">🔐 Giriş Yap</button>
+    <div class="login-error" id="loginError">Hatalı kullanıcı adı veya şifre</div>
+    <div class="login-hint">Test: <span>admin</span> / <span>atom2024</span></div>
+  </div>
+</div>
+<!-- APP SHELL -->
+<div class="shell" id="appShell" style="display:none">
 <aside class="sidebar">
   <div class="sb-head">
     <div class="sb-brand">
       <div class="sb-logo">A</div>
-      <div>
-        <div class="sb-name">ATOM OPS</div>
-        <div style="font-size:10px;color:var(--muted)">ops.atomkumpir.com</div>
-      </div>
+      <div><div class="sb-name">ATOM OPS</div><div style="font-size:10px;color:var(--muted)">ops.atomkumpir.com</div></div>
     </div>
     <span class="sb-role">🛡️ Administrator</span>
   </div>
-
   <nav class="sb-nav">
     <div class="sb-section">Yönetim</div>
     <div class="sb-item active" onclick="switchPanel('users',this)"><span class="ico">👥</span>Kullanıcılar</div>
     <div class="sb-item" onclick="switchPanel('menu',this)"><span class="ico">🍔</span>Menü Yönetimi</div>
     <div class="sb-item" onclick="switchPanel('tables',this)"><span class="ico">🪑</span>Masa & QR</div>
     <div class="sb-item" onclick="switchPanel('barcode',this)"><span class="ico">📦</span>Barkod</div>
-
     <div class="sb-section">Entegrasyonlar</div>
     <div class="sb-item" onclick="switchPanel('integrations',this)"><span class="ico">🔌</span>Pazaryeri API</div>
     <div class="sb-item" onclick="switchPanel('courier',this)"><span class="ico">🛵</span>Kurye API</div>
     <div class="sb-item" onclick="switchPanel('printer',this)"><span class="ico">🖨️</span>Yazıcı</div>
     <div class="sb-item" onclick="switchPanel('efatura',this)"><span class="ico">🧾</span>e-Fatura / POS</div>
     <div class="sb-item" onclick="switchPanel('erp',this)"><span class="ico">🏢</span>ERP / B2B / B2C</div>
-
     <div class="sb-section">Analiz</div>
     <div class="sb-item" onclick="switchPanel('reports',this)"><span class="ico">📊</span>Raporlama</div>
-
+    <div class="sb-section">Ekran Yönetimi</div>
+    <div class="sb-item" onclick="switchPanel('kiosk',this)"><span class="ico">🖥️</span>Kiosk Yönetimi</div>
+    <div class="sb-item" onclick="switchPanel('menuboard',this)"><span class="ico">📺</span>Menü Board</div>
+    <div class="sb-item" onclick="switchPanel('sliders',this)"><span class="ico">🎞️</span>Slider / Kampanya</div>
     <div class="sb-section">Sayfalar</div>
     <div class="sb-item" onclick="window.open('index.html','_blank')"><span class="ico">🌐</span>Landing Page</div>
-    <div class="sb-item" onclick="window.open('musteri-siparis.html','_blank')"><span class="ico">📱</span>Sipariş Ekranı</div>
-    <div class="sb-item" onclick="window.open('masa-qr-yonetimi.html','_blank')"><span class="ico">📋</span>QR Yönetim</div>
+    <div class="sb-item" onclick="window.open('ops-login.html','_blank')"><span class="ico">🔑</span>OPS Login</div>
   </nav>
-
   <div class="sb-foot">
     <div class="sb-user">
       <div class="sb-avatar">A</div>
-      <div>
-        <div class="sb-uname">Admin</div>
-        <div class="sb-uemail">atom2024</div>
-      </div>
-      <button class="logout-btn" onclick="logout()" title="Çıkış">⎋</button>
+      <div><div class="sb-uname" id="sbUserName">Admin</div><div class="sb-uemail" id="sbUserSub">atom2024</div></div>
+      <button class="sb-logout" onclick="doLogout()">⏻ Çıkış</button>
     </div>
   </div>
 </aside>
-
-<!-- MAIN -->
 <div class="main">
-
-  <!-- TOPBAR -->
   <div class="topbar">
     <span class="tb-title" id="topTitle">Kullanıcı Yönetimi</span>
     <div class="tb-right">
       <span class="tb-clock" id="clock">--:--:--</span>
-      <div class="notif-btn" onclick="showToast('📬 3 yeni bildirim')">🔔<div class="notif-dot"></div></div>
+      <div class="notif-btn" onclick="showToast('📬 Bildirimler: Trendyol 3 yeni sipariş · Stok uyarısı: Crispy Chicken')">🔔<div class="notif-dot"></div></div>
+      <button class="tb-logout" onclick="doLogout()">⏻ Çıkış</button>
     </div>
   </div>
 
-  <!-- ═══ PANEL: USERS ═══ -->
+  <!-- USERS -->
   <div class="panel active" id="panel-users">
     <div class="pg-head">
-      <div class="pg-title"><h2>Kullanıcı Yönetimi</h2><p>Hesaplar · Roller · Ekran izinleri</p></div>
-      <div class="btn-row">
-        <button class="btn primary" onclick="openUserModal()">+ Yeni Kullanıcı</button>
-      </div>
+      <div class="pg-title"><h2>Kullanıcı Yönetimi</h2><p>Hesaplar · Roller · İzinler</p></div>
+      <button class="btn primary" onclick="openUserModal()">+ Yeni Kullanıcı</button>
     </div>
-
     <div class="card">
-      <div class="card-head">
-        <h3>Sistem Kullanıcıları</h3>
-        <span style="font-size:11px;color:var(--muted)">6 kullanıcı</span>
-      </div>
-      <div style="overflow-x:auto">
-        <table class="users-table" id="usersTable"></table>
-      </div>
+      <div class="card-head"><h3>Sistem Kullanıcıları</h3><span id="userCount" style="font-size:11px;color:var(--muted)">6 kullanıcı</span></div>
+      <div style="overflow-x:auto"><table class="users-table" id="usersTable"></table></div>
     </div>
   </div>
 
-  <!-- ═══ PANEL: MENU ═══ -->
+  <!-- MENU -->
   <div class="panel" id="panel-menu">
     <div class="pg-head">
       <div class="pg-title"><h2>Menü Yönetimi</h2><p>Ürün görselleri · Fiyatlar · Stok durumu</p></div>
       <div class="btn-row">
         <button class="btn danger" onclick="toggleAllMenu(false)">🔴 Tümünü Kapat</button>
         <button class="btn success" onclick="toggleAllMenu(true)">🟢 Tümünü Aç</button>
-        <button class="btn primary" onclick="openMenuModal()">+ Ürün Ekle</button>
+        <button class="btn primary" onclick="openAddMenuModal()">+ Ürün Ekle</button>
       </div>
     </div>
-
     <div style="display:flex;gap:8px;flex-wrap:wrap" id="catFilterBar">
-      <button class="act" style="padding:6px 14px;border-radius:20px" onclick="filterCat('all',this)" id="cf-all">Tümü</button>
+      <button class="act" style="padding:6px 14px;border-radius:20px;background:rgba(255,255,255,.08);color:var(--text)" onclick="filterCat('all',this)">Tümü</button>
       <button class="act" style="padding:6px 14px;border-radius:20px" onclick="filterCat('kumpir',this)">🥔 Kumpir</button>
       <button class="act" style="padding:6px 14px;border-radius:20px" onclick="filterCat('burger',this)">🍔 Burger</button>
       <button class="act" style="padding:6px 14px;border-radius:20px" onclick="filterCat('waffle',this)">🧇 Waffle</button>
       <button class="act" style="padding:6px 14px;border-radius:20px" onclick="filterCat('drink',this)">🥤 İçecek</button>
     </div>
-
     <div class="menu-grid" id="menuGrid"></div>
   </div>
 
-  <!-- ═══ PANEL: TABLES ═══ -->
+  <!-- TABLES -->
   <div class="panel" id="panel-tables">
     <div class="pg-head">
-      <div class="pg-title"><h2>Masa & QR Yönetimi</h2><p>QR kod yaratma · Masa ekleme · İsimlendirme</p></div>
+      <div class="pg-title"><h2>Masa & QR Yönetimi</h2><p>QR kod · Masa ekleme · Durum izleme</p></div>
       <div class="btn-row">
         <button class="btn primary" onclick="openMasaModal()">+ Masa Ekle</button>
-        <button class="btn" onclick="printAllQR()">🖨️ Tümünü Yazdır</button>
+        <button class="btn" onclick="showToast('🖨️ '+MASALAR.length+' QR yazdırılıyor...')">🖨️ Tümünü Yazdır</button>
       </div>
     </div>
     <div class="masa-grid" id="masaGrid"></div>
   </div>
 
-  <!-- ═══ PANEL: BARCODE ═══ -->
+  <!-- BARCODE -->
   <div class="panel" id="panel-barcode">
     <div class="pg-head">
-      <div class="pg-title"><h2>Barkod Oluşturma</h2><p>Ürün barkodları · QR kodlar · Etiket yazdırma</p></div>
-      <div class="btn-row"><button class="btn primary" onclick="showToast('🖨️ Toplu barkod yazdırılıyor...')">🖨️ Toplu Yazdır</button></div>
+      <div class="pg-title"><h2>Barkod Oluşturma</h2><p>EAN-13 · QR Code · Code 128 · Etiket yazdırma</p></div>
     </div>
-    <div class="card">
-      <div class="card-body">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start">
-          <div>
-            <div class="form-row" style="margin-bottom:12px">
-              <div class="form-label">Ürün / İçerik</div>
-              <input class="form-input" id="barcodeContent" placeholder="Kumpir Klasik - ₺149" oninput="generateBarcode()">
-            </div>
-            <div class="form-row" style="margin-bottom:12px">
-              <div class="form-label">Barkod Tipi</div>
-              <select class="form-input" id="barcodeType" onchange="generateBarcode()">
-                <option>EAN-13</option><option>QR Code</option><option>Code 128</option><option>Data Matrix</option>
-              </select>
-            </div>
-            <div class="form-row" style="margin-bottom:16px">
-              <div class="form-label">Adet</div>
-              <input class="form-input" type="number" value="1" min="1" max="100">
-            </div>
-            <button class="btn primary" onclick="showToast('✅ Barkod oluşturuldu')">Oluştur & Yazdır</button>
-          </div>
-          <div style="background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:14px;padding:24px;text-align:center">
-            <div style="font-size:48px;margin-bottom:12px">📊</div>
-            <div id="barcodePreview" style="font-family:var(--mono);font-size:13px;color:var(--muted)">Barkod önizleme burada görünecek</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div class="card">
+        <div class="card-head"><h3>Barkod Oluştur</h3></div>
+        <div class="card-body" style="display:flex;flex-direction:column;gap:12px">
+          <div class="form-row"><div class="form-label">Ürün / İçerik</div><input class="form-input" id="barcodeContent" placeholder="Kumpir Klasik - ₺149" oninput="generateBarcode()"></div>
+          <div class="form-row"><div class="form-label">Barkod Tipi</div>
+            <select class="form-input" id="barcodeType" onchange="generateBarcode()">
+              <option>EAN-13</option><option>QR Code</option><option>Code 128</option><option>Data Matrix</option>
+            </select></div>
+          <div class="form-row"><div class="form-label">Adet</div><input class="form-input" id="barcodeQty" type="number" value="1" min="1" max="100"></div>
+          <div style="display:flex;gap:8px">
+            <button class="btn primary" onclick="generateBarcode()">🔍 Önizle</button>
+            <button class="btn" onclick="showToast('🖨️ Barkod yazdırıldı')">🖨️ Yazdır</button>
           </div>
         </div>
       </div>
+      <div class="card">
+        <div class="card-head"><h3>Önizleme</h3></div>
+        <div class="card-body" style="text-align:center;padding:40px 20px">
+          <div id="barcodeVisual" style="font-size:44px;margin-bottom:14px">📊</div>
+          <div id="barcodePreview" style="font-family:var(--mono);font-size:14px;color:var(--muted);letter-spacing:4px">_ _ _ _ _ _ _ _</div>
+          <div id="barcodeLabel" style="font-size:11px;color:var(--muted);margin-top:8px">İçerik girin</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><h3>Menüden Toplu Barkod</h3></div>
+      <div class="card-body"><div id="menuBarcodeList" style="display:flex;flex-direction:column;gap:8px"></div></div>
     </div>
   </div>
 
-  <!-- ═══ PANEL: INTEGRATIONS ═══ -->
+  <!-- INTEGRATIONS -->
   <div class="panel" id="panel-integrations">
     <div class="pg-head">
       <div class="pg-title"><h2>Pazaryeri API Entegrasyonları</h2><p>Otomatik stok sync · Sipariş çekme · Fiyat güncelleme</p></div>
@@ -405,42 +445,79 @@ a{color:inherit;text-decoration:none}
     <div class="int-grid" id="intGrid"></div>
   </div>
 
-  <!-- ═══ PANEL: COURIER ═══ -->
+  <!-- COURIER -->
   <div class="panel" id="panel-courier">
     <div class="pg-head">
       <div class="pg-title"><h2>Kurye API Entegrasyonları</h2><p>Teslimat takip · Canlı konum · WhatsApp bildirim</p></div>
+      <button class="btn primary" onclick="showToast('📡 Kurye APIleri yenileniyor...')">🔄 Yenile</button>
     </div>
     <div class="int-grid" id="courierGrid"></div>
-  </div>
-
-  <!-- ═══ PANEL: PRINTER ═══ -->
-  <div class="panel" id="panel-printer">
-    <div class="pg-head">
-      <div class="pg-title"><h2>Yazıcı Ayarları</h2><p>Termal yazıcı · Fiş formatı · Test yazdırma</p></div>
-    </div>
-    <div class="card" style="max-width:600px">
-      <div class="card-head"><h3>Bağlı Yazıcılar</h3></div>
-      <div class="card-body" style="display:flex;flex-direction:column;gap:12px">
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:rgba(34,197,94,.05);border:1px solid rgba(34,197,94,.15);border-radius:11px">
-          <div><div style="font-size:13px;font-weight:700">EPSON TM-T88VI</div><div style="font-size:11px;color:var(--muted)">USB · Mutfak yazıcısı</div></div>
-          <div style="display:flex;gap:8px">
-            <span style="font-size:11px;font-weight:700;color:var(--green)">● Bağlı</span>
-            <button class="act" onclick="showToast('🖨️ Test sayfası yazdırıldı')">Test</button>
-          </div>
+    <div class="card">
+      <div class="card-head"><h3>🛵 Aktif Teslimatlar</h3><span style="font-size:11px;color:var(--green)">2 aktif kurye</span></div>
+      <div class="card-body" style="display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;align-items:center;gap:12px;padding:12px;background:rgba(34,197,94,.04);border:1px solid rgba(34,197,94,.15);border-radius:10px">
+          <span style="font-size:20px">🛵</span>
+          <div style="flex:1"><div style="font-size:12px;font-weight:700">Kurye #1 - Ahmet K.</div><div style="font-size:10px;color:var(--muted)">Sipariş #4231 · Gebze Merkez · ETA 8dk</div></div>
+          <span style="font-size:10px;font-weight:700;color:var(--green)">● Yolda</span>
+          <button class="act" onclick="showToast('📍 40.7891, 29.4232')">📍</button>
+          <button class="act" onclick="showToast('📞 Kurye aranıyor...')">📞</button>
         </div>
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:11px">
-          <div><div style="font-size:13px;font-weight:700">Star TSP654II</div><div style="font-size:11px;color:var(--muted)">Network · Kasa yazıcısı</div></div>
-          <div style="display:flex;gap:8px">
-            <span style="font-size:11px;font-weight:700;color:var(--green)">● Bağlı</span>
-            <button class="act" onclick="showToast('🖨️ Test sayfası yazdırıldı')">Test</button>
-          </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:12px;background:rgba(245,158,11,.04);border:1px solid rgba(245,158,11,.15);border-radius:10px">
+          <span style="font-size:20px">🛵</span>
+          <div style="flex:1"><div style="font-size:12px;font-weight:700">Kurye #2 - Mert S.</div><div style="font-size:10px;color:var(--muted)">Sipariş #4229 · Darıca · ETA 15dk</div></div>
+          <span style="font-size:10px;font-weight:700;color:var(--amber)">● Hazırlanıyor</span>
+          <button class="act" onclick="showToast('📍 Henüz yola çıkmadı')">📍</button>
+          <button class="act" onclick="showToast('📞 Aranıyor...')">📞</button>
         </div>
-        <button class="btn primary" style="align-self:flex-start" onclick="showToast('🔍 Yazıcı aranıyor...')">+ Yazıcı Ekle</button>
       </div>
     </div>
   </div>
 
-  <!-- ═══ PANEL: E-FATURA ═══ -->
+  <!-- PRINTER -->
+  <div class="panel" id="panel-printer">
+    <div class="pg-head">
+      <div class="pg-title"><h2>Yazıcı Ayarları</h2><p>Termal yazıcı · Fiş formatı · Test yazdırma</p></div>
+      <button class="btn primary" onclick="showToast('🔍 Ağdaki yazıcılar taranıyor...')">+ Yazıcı Ekle</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div class="card">
+        <div class="card-head"><h3>Bağlı Yazıcılar</h3></div>
+        <div class="card-body" style="display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:14px;background:rgba(34,197,94,.05);border:1px solid rgba(34,197,94,.2);border-radius:12px">
+            <div><div style="font-size:13px;font-weight:700">EPSON TM-T88VI</div><div style="font-size:11px;color:var(--muted)">USB · Mutfak · 80mm</div></div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <span style="font-size:11px;font-weight:700;color:var(--green)">● Bağlı</span>
+              <button class="act" onclick="showToast('🖨️ EPSON test OK')">Test</button>
+              <button class="act" onclick="showToast('⚙️ EPSON ayarları')">⚙️</button>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:14px;background:rgba(34,197,94,.05);border:1px solid rgba(34,197,94,.2);border-radius:12px">
+            <div><div style="font-size:13px;font-weight:700">Star TSP654II</div><div style="font-size:11px;color:var(--muted)">Network · Kasa · 80mm</div></div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <span style="font-size:11px;font-weight:700;color:var(--green)">● Bağlı</span>
+              <button class="act" onclick="showToast('🖨️ Star test OK')">Test</button>
+              <button class="act" onclick="showToast('⚙️ Star ayarları')">⚙️</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h3>Fiş Formatı</h3></div>
+        <div class="card-body" style="display:flex;flex-direction:column;gap:10px">
+          <div class="form-row"><div class="form-label">Restoran Adı</div><input class="form-input" value="ATOM Kumpir & Waffle"></div>
+          <div class="form-row"><div class="form-label">Adres</div><input class="form-input" value="Soğanlık, Kartal, İstanbul"></div>
+          <div class="form-row"><div class="form-label">Tel</div><input class="form-input" value="+90 535 977 72 75"></div>
+          <div class="form-row"><div class="form-label">Alt Mesaj</div><input class="form-input" value="Afiyet olsun! Teşekkür ederiz 🧡"></div>
+          <div style="display:flex;gap:8px">
+            <button class="btn primary" onclick="showToast('✅ Fiş formatı kaydedildi')">Kaydet</button>
+            <button class="btn" onclick="showToast('🖨️ Test fişi yazdırıldı')">Test Fişi</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- E-FATURA -->
   <div class="panel" id="panel-efatura">
     <div class="pg-head">
       <div class="pg-title"><h2>e-Fatura & Mobil POS</h2><p>GİB entegrasyonu · Fatura otomasyonu · POS cihazları</p></div>
@@ -449,38 +526,54 @@ a{color:inherit;text-decoration:none}
       <div class="card">
         <div class="card-head"><h3>🧾 e-Fatura (GİB)</h3></div>
         <div class="card-body" style="display:flex;flex-direction:column;gap:10px">
-          <div class="form-row"><div class="form-label">VKN / TCKN</div><input class="form-input" value="1234567890"></div>
+          <div class="form-row"><div class="form-label">VKN / TCKN</div><input class="form-input" id="gibVkn" value="1234567890"></div>
           <div class="form-row"><div class="form-label">GİB Şifresi</div><input class="form-input" type="password" value="••••••••"></div>
           <div class="form-row"><div class="form-label">Entegratör</div>
             <select class="form-input"><option>Logo e-Fatura</option><option>Mikro</option><option>Luca</option></select></div>
-          <div style="display:flex;gap:8px;margin-top:4px">
-            <button class="btn primary" onclick="showToast('✅ e-Fatura bağlantısı aktif')">Bağlan</button>
-            <button class="btn" onclick="showToast('🧪 Test faturası gönderildi')">Test Fatura</button>
+          <div class="form-row"><div class="form-label">Ortam</div>
+            <select class="form-input"><option>Test (Entegrasyon)</option><option>Prod (Canlı)</option></select></div>
+          <div style="display:flex;gap:8px">
+            <button class="btn primary" onclick="connectEFatura()">🔌 Bağlan</button>
+            <button class="btn" onclick="testEFatura()">🧪 Test Fatura</button>
           </div>
+          <div id="efaturaStatus" style="font-size:11px;color:var(--muted);padding:8px;background:rgba(255,255,255,.03);border-radius:8px">Durum: Kontrol edilmedi</div>
         </div>
       </div>
       <div class="card">
         <div class="card-head"><h3>💳 Mobil POS</h3></div>
         <div class="card-body" style="display:flex;flex-direction:column;gap:10px">
           <div class="form-row"><div class="form-label">POS Sağlayıcı</div>
-            <select class="form-input"><option>Garanti BBVA POS</option><option>İşbank POS</option><option>Akbank POS</option><option>PayTR</option></select></div>
-          <div class="form-row"><div class="form-label">Terminal ID</div><input class="form-input" placeholder="80000001"></div>
+            <select class="form-input"><option>Garanti BBVA</option><option>İşbank POS</option><option>Akbank POS</option><option>PayTR</option><option>Sipay</option></select></div>
+          <div class="form-row"><div class="form-label">Terminal ID</div><input class="form-input" id="posTerminal" placeholder="80000001"></div>
           <div class="form-row"><div class="form-label">Merchant ID</div><input class="form-input" placeholder="000000001"></div>
-          <button class="btn primary" onclick="showToast('✅ POS cihazı bağlandı')">Bağlan</button>
+          <div class="form-row"><div class="form-label">API Secret</div><input class="form-input" type="password" placeholder="••••••••••••"></div>
+          <button class="btn primary" onclick="connectPOS()">🔌 POS Bağla</button>
+          <div id="posStatus" style="font-size:11px;color:var(--muted);padding:8px;background:rgba(255,255,255,.03);border-radius:8px">POS durumu: Bekleniyor</div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ═══ PANEL: ERP ═══ -->
+  <!-- ERP -->
   <div class="panel" id="panel-erp">
     <div class="pg-head">
       <div class="pg-title"><h2>ERP / B2B / B2C Entegrasyonları</h2><p>Muhasebe · Tedarik · Müşteri sistemleri</p></div>
+      <button class="btn primary" onclick="showToast('🔄 ERP bağlantıları yenileniyor...')">🔄 Yenile</button>
     </div>
     <div class="int-grid" id="erpGrid"></div>
+    <div class="card">
+      <div class="card-head"><h3>📤 Veri Aktarımı</h3></div>
+      <div class="card-body" style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:10px;align-items:end">
+        <div class="form-row"><div class="form-label">Tip</div>
+          <select class="form-input"><option>Günlük Satış</option><option>Stok Güncelleme</option><option>Fatura</option></select></div>
+        <div class="form-row"><div class="form-label">Başlangıç</div><input class="form-input" type="date"></div>
+        <div class="form-row"><div class="form-label">Bitiş</div><input class="form-input" type="date"></div>
+        <button class="btn primary" onclick="showToast('📤 Veri aktarımı başlatıldı')">📤 Aktar</button>
+      </div>
+    </div>
   </div>
 
-  <!-- ═══ PANEL: REPORTS ═══ -->
+  <!-- REPORTS -->
   <div class="panel" id="panel-reports">
     <div class="pg-head">
       <div class="pg-title"><h2>Muhasebesel Raporlama</h2><p>Gelir · Gider · Kar/Zarar · KDV · Ciro analizi</p></div>
@@ -489,32 +582,212 @@ a{color:inherit;text-decoration:none}
         <button class="btn" onclick="showToast('📄 PDF hazırlanıyor...')">📄 PDF</button>
       </div>
     </div>
-
-    <div style="display:flex;gap:8px;margin-bottom:4px">
-      <button class="act" onclick="showToast('Günlük rapor')">Günlük</button>
-      <button class="act" onclick="showToast('Haftalık rapor')">Haftalık</button>
-      <button class="act" onclick="showToast('Aylık rapor')" style="background:rgba(255,255,255,.06);color:var(--text)">Aylık</button>
-      <button class="act" onclick="showToast('Yıllık rapor')">Yıllık</button>
+    <div style="display:flex;gap:8px;flex-wrap:wrap" id="reportPeriodBar">
+      <button class="act" style="padding:6px 14px;border-radius:20px" onclick="setReportPeriod('günlük',this)">Günlük</button>
+      <button class="act" style="padding:6px 14px;border-radius:20px" onclick="setReportPeriod('haftalık',this)">Haftalık</button>
+      <button class="act" style="padding:6px 14px;border-radius:20px;background:rgba(255,255,255,.08);color:var(--text)" onclick="setReportPeriod('aylık',this)">Aylık</button>
+      <button class="act" style="padding:6px 14px;border-radius:20px" onclick="setReportPeriod('yıllık',this)">Yıllık</button>
     </div>
-
     <div class="stat-grid">
       <div class="stat-card sc-g"><div class="s-lbl">Aylık Ciro</div><div class="s-val sv-g">₺284K</div><div class="s-delta">▲ %18 geçen ay</div></div>
       <div class="stat-card sc-b"><div class="s-lbl">Net Kar</div><div class="s-val sv-b">₺68.4K</div><div class="s-delta">%24 marj</div></div>
-      <div class="stat-card sc-a"><div class="s-lbl">KDV (₺)</div><div class="s-val sv-a">₺25.6K</div><div class="s-delta">Beyan: 25 Mart</div></div>
+      <div class="stat-card sc-a"><div class="s-lbl">KDV</div><div class="s-val sv-a">₺25.6K</div><div class="s-delta">Beyan: 25 Mart</div></div>
       <div class="stat-card sc-r"><div class="s-lbl">Gider</div><div class="s-val sv-r">₺215K</div><div class="s-delta">▼ %3 azaldı</div></div>
     </div>
-
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-      <div class="card">
-        <div class="card-head"><h3>Kanal Bazlı Ciro</h3></div>
-        <div class="card-body" style="display:flex;flex-direction:column;gap:10px">
-          <div id="channelChart"></div>
+      <div class="card"><div class="card-head"><h3>Kanal Bazlı Ciro</h3></div><div class="card-body"><div id="channelChart"></div></div></div>
+      <div class="card"><div class="card-head"><h3>Gider Dağılımı</h3></div><div class="card-body"><div id="expenseChart"></div></div></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><h3>Gelir / Gider Tablosu</h3><span style="font-size:11px;color:var(--muted)">Mart 2026</span></div>
+      <div style="overflow-x:auto"><table class="users-table" id="plTable"></table></div>
+    </div>
+  </div>
+
+  <!-- KIOSK -->
+  <div class="panel" id="panel-kiosk">
+    <div class="pg-head">
+      <div class="pg-title"><h2>Kiosk Yönetimi</h2><p>Self-servis sipariş · Cihaz durumu · Canlı önizleme</p></div>
+      <div class="btn-row">
+        <button class="btn" onclick="restartKiosk()">🔄 Yeniden Başlat</button>
+        <button class="btn primary" onclick="pushKiosk()">📤 Yayınla</button>
+      </div>
+    </div>
+    <div class="screen-status-bar" id="kioskStatusBar"></div>
+    <div class="screen-row">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:12px">
+        <div style="font-size:10px;font-weight:700;letter-spacing:1px;color:var(--muted);text-transform:uppercase">Canlı Önizleme</div>
+        <div style="position:relative">
+          <div class="screen-kiosk">
+            <span class="screen-badge sb-live" id="kioskBadge">● CANLI</span>
+            <div class="kiosk-inner" id="kioskPreview"></div>
+          </div>
+        </div>
+        <div style="display:flex;gap:7px;flex-wrap:wrap;justify-content:center">
+          <button class="btn" onclick="showToast('☀️ Parlaklık: 80%')">☀️ Parlaklık</button>
+          <button class="btn" onclick="showToast('↻ Ekran döndürüldü')">↻ Döndür</button>
+          <button class="btn danger" onclick="shutdownKiosk()">⏻ Kapat</button>
         </div>
       </div>
+      <div class="screen-controls">
+        <div class="ctrl-section">
+          <div class="ctrl-title">Genel Ayarlar</div>
+          <div class="tog-row"><div><div class="tog-label">🖥️ Kiosk Aktif</div><div class="tog-sub">Müşteriler sipariş verebilir</div></div><button class="sw on" onclick="toggleSw(this,'Kiosk')"></button></div>
+          <div class="tog-row"><div><div class="tog-label">💳 Kredi Kartı Ödeme</div><div class="tog-sub">POS ödemesi kabul et</div></div><button class="sw on" onclick="toggleSw(this,'Kredi Kartı')"></button></div>
+          <div class="tog-row"><div><div class="tog-label">🖨️ Fiş Yazdırma</div><div class="tog-sub">Sipariş fişi otomatik çıkar</div></div><button class="sw on" onclick="toggleSw(this,'Fiş')"></button></div>
+          <div class="tog-row"><div><div class="tog-label">📢 Ses Bildirimleri</div><div class="tog-sub">Kiosk sesli uyarılar</div></div><button class="sw off" onclick="toggleSw(this,'Ses')"></button></div>
+          <div class="tog-row"><div><div class="tog-label">🌙 Ekran Koruyucu</div><div class="tog-sub">3 dk hareketsizlikte devreye girer</div></div><button class="sw on" onclick="toggleSw(this,'Ekran Koruyucu')"></button></div>
+        </div>
+        <div class="ctrl-section">
+          <div class="ctrl-title">Görünüm & Mesaj</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+            <div><div class="form-label" style="margin-bottom:5px">Karşılama</div><input class="form-input" id="kiWelcome" value="Hoş Geldiniz! 🧡" oninput="refreshKioskPreview()"></div>
+            <div><div class="form-label" style="margin-bottom:5px">Alt Mesaj</div><input class="form-input" id="kiSub" value="Siparişinizi kolayca verin" oninput="refreshKioskPreview()"></div>
+          </div>
+          <div class="form-label" style="margin-bottom:6px">Tema</div>
+          <div style="display:flex;gap:7px" id="kioskThemeGroup">
+            <button class="act" style="padding:6px 14px;border-radius:20px;background:rgba(232,57,14,.15);color:var(--red);border-color:var(--red)" onclick="setKioskTheme('red',this)">🔴 Kırmızı</button>
+            <button class="act" style="padding:6px 14px;border-radius:20px" onclick="setKioskTheme('dark',this)">⚫ Koyu</button>
+            <button class="act" style="padding:6px 14px;border-radius:20px" onclick="setKioskTheme('gold',this)">🟡 Altın</button>
+          </div>
+        </div>
+        <div class="ctrl-section">
+          <div class="ctrl-title">Kategori Görünürlük</div>
+          <div style="display:flex;flex-direction:column;gap:5px">
+            <div style="display:flex;align-items:center;gap:10px;padding:9px 12px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:9px"><span style="color:var(--muted)">⠿</span><span style="font-size:12px;font-weight:600;flex:1">🥔 Kumpir</span><button class="sw on" onclick="toggleSw(this,'Kumpir kategorisi')"></button></div>
+            <div style="display:flex;align-items:center;gap:10px;padding:9px 12px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:9px"><span style="color:var(--muted)">⠿</span><span style="font-size:12px;font-weight:600;flex:1">🍔 Burger</span><button class="sw on" onclick="toggleSw(this,'Burger kategorisi')"></button></div>
+            <div style="display:flex;align-items:center;gap:10px;padding:9px 12px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:9px"><span style="color:var(--muted)">⠿</span><span style="font-size:12px;font-weight:600;flex:1">🧇 Waffle</span><button class="sw on" onclick="toggleSw(this,'Waffle kategorisi')"></button></div>
+            <div style="display:flex;align-items:center;gap:10px;padding:9px 12px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:9px"><span style="color:var(--muted)">⠿</span><span style="font-size:12px;font-weight:600;flex:1">🥤 İçecek</span><button class="sw on" onclick="toggleSw(this,'İçecek kategorisi')"></button></div>
+          </div>
+        </div>
+        <div class="ctrl-section">
+          <div class="ctrl-title">Çalışma Saatleri</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <div><div class="form-label" style="margin-bottom:5px">Açılış</div><input class="form-input" type="time" value="09:00" onchange="showToast('⏰ Açılış güncellendi')"></div>
+            <div><div class="form-label" style="margin-bottom:5px">Kapanış</div><input class="form-input" type="time" value="23:00" onchange="showToast('⏰ Kapanış güncellendi')"></div>
+          </div>
+          <div style="margin-top:8px"><div class="form-label" style="margin-bottom:5px">Kapalı Mesajı</div><input class="form-input" value="Şu an kapalıyız. Yakında görüşürüz 🙏" onchange="showToast('✅ Kapalı mesajı güncellendi')"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MENUBOARD -->
+  <div class="panel" id="panel-menuboard">
+    <div class="pg-head">
+      <div class="pg-title"><h2>Menü Board</h2><p>TV dijital tabela · Canlı önizleme · Layout yönetimi</p></div>
+      <div class="btn-row">
+        <button class="btn" onclick="cycleTVLayout()">⊞ Layout Değiştir</button>
+        <button class="btn primary" onclick="pushBoard()">📤 Tüm TVlere Yayınla</button>
+      </div>
+    </div>
+    <div class="screen-status-bar" id="boardStatusBar"></div>
+    <div class="screen-row">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:12px">
+        <div style="font-size:10px;font-weight:700;letter-spacing:1px;color:var(--muted);text-transform:uppercase">TV Önizleme (1920×1080)</div>
+        <div style="position:relative">
+          <div class="screen-tv">
+            <span class="screen-badge sb-live">● CANLI</span>
+            <div class="tv-inner" id="tvPreview"></div>
+          </div>
+        </div>
+        <div style="display:flex;gap:7px">
+          <button class="btn" onclick="showToast('🔊 Ses: 50%')">🔊 Ses</button>
+          <button class="btn" onclick="cycleTVLayout()">⊞ Layout</button>
+          <button class="btn" onclick="showToast('📡 Test OK ✅')">📡 Test</button>
+        </div>
+      </div>
+      <div class="screen-controls">
+        <div class="ctrl-section">
+          <div class="ctrl-title">Ekran Ayarları</div>
+          <div class="tog-row"><div><div class="tog-label">📺 Board Aktif</div><div class="tog-sub">TV ekranı içerik gösteriyor</div></div><button class="sw on" onclick="toggleSw(this,'Menü Board')"></button></div>
+          <div class="tog-row"><div><div class="tog-label">🏃 Öne Çıkan Ürün Rotasyonu</div><div class="tog-sub">Her 30sn ürün değişir</div></div><button class="sw on" onclick="toggleSw(this,'Ürün Rotasyonu')"></button></div>
+          <div class="tog-row"><div><div class="tog-label">📰 Kayan Haber Bandı</div><div class="tog-sub">Alt kısım akıllı ticker</div></div><button class="sw on" onclick="toggleSw(this,'Haber Bandı')"></button></div>
+          <div class="tog-row"><div><div class="tog-label">⏰ Saat Gösterimi</div><div class="tog-sub">Sağ alt köşede canlı saat</div></div><button class="sw on" onclick="toggleSw(this,'Saat')"></button></div>
+          <div class="tog-row"><div><div class="tog-label">💰 Fiyat Etiketleri</div><div class="tog-sub">Ürün fiyatlarını göster</div></div><button class="sw on" onclick="toggleSw(this,'Fiyatlar')"></button></div>
+        </div>
+        <div class="ctrl-section">
+          <div class="ctrl-title">Öne Çıkan Ürün</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+            <div><div class="form-label" style="margin-bottom:5px">Ürün</div>
+              <select class="form-input" onchange="updateTVPreview()"><option>Double Smash</option><option>Kumpir Spesyal</option><option>Waffle Tatlı</option><option>Kumpir Klasik</option></select></div>
+            <div><div class="form-label" style="margin-bottom:5px">Badge</div>
+              <select class="form-input"><option>🔥 GÜNÜN MENÜSÜ</option><option>⭐ ÖZEL</option><option>🎉 KAMPANYA</option><option>YENİ</option></select></div>
+          </div>
+          <div><div class="form-label" style="margin-bottom:5px">Açıklama</div><input class="form-input" value="Fırında pişmiş, bol malzemeli 🧀" oninput="updateTVPreview()"></div>
+        </div>
+        <div class="ctrl-section">
+          <div class="ctrl-title">Kayan Yazı</div>
+          <textarea class="form-input" rows="2" id="tvTickerText" style="resize:vertical" oninput="updateTVPreview()">⭐ Trendyol ve Getir'de sipariş verin!      🔥 Smash Burger %10 indirimli      📍 Gebze Merkez · 09:00-23:00</textarea>
+        </div>
+        <div class="ctrl-section">
+          <div class="ctrl-title">Bağlı Ekranlar</div>
+          <div id="connectedScreens" style="display:flex;flex-direction:column;gap:7px"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDERS -->
+  <div class="panel" id="panel-sliders">
+    <div class="pg-head">
+      <div class="pg-title"><h2>Slider & Kampanya Yönetimi</h2><p>Kiosk · Menü Board · Landing Page sliderları</p></div>
+      <div class="btn-row">
+        <button class="btn primary" onclick="openSliderForm()">+ Yeni Slider</button>
+        <button class="btn" onclick="showToast('📤 '+SLIDERS.filter(s=>s.active).length+' slider yayınlandı ✅')">📤 Tümünü Yayınla</button>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap" id="sliderTargetFilter">
+      <button class="btn" style="background:rgba(255,255,255,.08);color:var(--text)" onclick="filterSliders('all',this)">Tümü</button>
+      <button class="btn" onclick="filterSliders('kiosk',this)">🖥️ Kiosk</button>
+      <button class="btn" onclick="filterSliders('board',this)">📺 Board</button>
+      <button class="btn" onclick="filterSliders('landing',this)">🌐 Landing</button>
+    </div>
+    <div>
+      <div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Canlı Carousel Önizleme</div>
+      <div class="preview-carousel" id="previewCarousel">
+        <button class="pc-nav pc-prev" onclick="prevSlide()">‹</button>
+        <button class="pc-nav pc-next" onclick="nextSlide()">›</button>
+        <div class="pc-dots" id="pcDots"></div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
       <div class="card">
-        <div class="card-head"><h3>Gider Dağılımı</h3></div>
-        <div class="card-body">
-          <div id="expenseChart"></div>
+        <div class="card-head"><h3>Slider Listesi</h3><span id="activeSliderCnt" style="font-size:11px;color:var(--muted)">0 aktif</span></div>
+        <div class="card-body" style="padding:12px"><div id="sliderList"></div></div>
+      </div>
+      <div class="card" id="sliderForm">
+        <div class="card-head"><h3 id="sliderFormTitle">Yeni Slider Ekle</h3></div>
+        <div class="card-body" style="display:flex;flex-direction:column;gap:10px">
+          <div class="upload-zone" id="uploadZone" onclick="triggerUpload()" ondragover="event.preventDefault();this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')" ondrop="handleDrop(event)">
+            <div id="uzIcon" style="font-size:28px;margin-bottom:6px">🖼️</div>
+            <div style="font-size:12px;font-weight:700;margin-bottom:2px">Görsel Yükle</div>
+            <div style="font-size:10px;color:var(--muted)">PNG, JPG · Max 10MB veya URL girin</div>
+            <input type="file" id="fileInput" style="display:none" accept="image/*" onchange="handleFile(this)">
+          </div>
+          <div><div class="form-label" style="margin-bottom:5px">Görsel URL</div><input class="form-input" id="sliderImgUrl" placeholder="https://..." oninput="previewUrlImage()"></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <div><div class="form-label" style="margin-bottom:5px">Başlık</div><input class="form-input" id="sliderTitle" placeholder="Kumpir Spesyal 🧀"></div>
+            <div><div class="form-label" style="margin-bottom:5px">Alt Başlık</div><input class="form-input" id="sliderSub" placeholder="%10 indirim!"></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <div><div class="form-label" style="margin-bottom:5px">Tip</div>
+              <select class="form-input" id="sliderType">
+                <option value="promo">🔥 Promosyon</option><option value="product">🍔 Ürün</option><option value="event">🎉 Etkinlik</option><option value="info">ℹ️ Bilgi</option>
+              </select></div>
+            <div><div class="form-label" style="margin-bottom:5px">Süre (sn)</div><input class="form-input" type="number" id="sliderDuration" value="5" min="2" max="30"></div>
+          </div>
+          <div><div class="form-label" style="margin-bottom:6px">Yayın Ekranları</div>
+            <div style="display:flex;gap:14px">
+              <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px;font-weight:600"><input type="checkbox" id="chkKiosk" checked style="accent-color:var(--red)"> 🖥️ Kiosk</label>
+              <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px;font-weight:600"><input type="checkbox" id="chkBoard" checked style="accent-color:var(--red)"> 📺 Board</label>
+              <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px;font-weight:600"><input type="checkbox" id="chkLanding" style="accent-color:var(--red)"> 🌐 Landing</label>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn primary" style="flex:1;justify-content:center" onclick="saveSlider()">💾 Kaydet & Yayınla</button>
+            <button class="btn" onclick="resetSliderForm()">↺ Temizle</button>
+          </div>
         </div>
       </div>
     </div>
@@ -522,36 +795,25 @@ a{color:inherit;text-decoration:none}
 
 </div><!-- /main -->
 </div><!-- /shell -->
-
-<!-- USER MODAL -->
+<!-- MODALS -->
 <div class="modal-bg" id="userModal" onclick="if(event.target===this)closeModal('userModal')">
   <div class="modal">
-    <div class="modal-head">
-      <h3 id="userModalTitle">Yeni Kullanıcı</h3>
-      <button class="modal-x" onclick="closeModal('userModal')">✕</button>
-    </div>
+    <div class="modal-head"><h3 id="userModalTitle">Yeni Kullanıcı</h3><button class="modal-x" onclick="closeModal('userModal')">✕</button></div>
     <div class="modal-body">
       <div class="form-row-2">
         <div class="form-row"><div class="form-label">Ad Soyad</div><input class="form-input" id="uName" placeholder="Ahmet Yılmaz"></div>
-        <div class="form-row"><div class="form-label">Kullanıcı Adı</div><input class="form-input" id="uUsername" placeholder="ahmet.yilmaz"></div>
+        <div class="form-row"><div class="form-label">Kullanıcı Adı</div><input class="form-input" id="uUsername" placeholder="ahmet"></div>
       </div>
       <div class="form-row-2">
         <div class="form-row"><div class="form-label">Şifre</div><input class="form-input" id="uPass" type="password" placeholder="••••••••"></div>
         <div class="form-row"><div class="form-label">Rol</div>
           <select class="form-input" id="uRole">
-            <option value="admin">🛡️ Administrator</option>
-            <option value="patron">👑 Patron</option>
-            <option value="super">📊 Süpervizör</option>
-            <option value="kitchen">🍳 Mutfak</option>
-            <option value="waiter">🧑‍🍽️ Garson</option>
-            <option value="valet">🚗 Vale</option>
-          </select>
-        </div>
+            <option value="admin">🛡️ Administrator</option><option value="patron">👑 Patron</option>
+            <option value="super">📊 Süpervizör</option><option value="kitchen">🍳 Mutfak</option>
+            <option value="waiter">🧑‍🍽️ Garson</option><option value="valet">🚗 Vale</option>
+          </select></div>
       </div>
-      <div>
-        <div class="form-label" style="margin-bottom:8px">Ekran İzinleri</div>
-        <div class="perm-grid" id="permGrid"></div>
-      </div>
+      <div><div class="form-label" style="margin-bottom:8px">Ekran İzinleri</div><div class="perm-grid" id="permGrid"></div></div>
     </div>
     <div class="modal-foot">
       <button class="modal-cancel" onclick="closeModal('userModal')">İptal</button>
@@ -560,21 +822,20 @@ a{color:inherit;text-decoration:none}
   </div>
 </div>
 
-<!-- MASA MODAL -->
 <div class="modal-bg" id="masaModal" onclick="if(event.target===this)closeModal('masaModal')">
   <div class="modal">
     <div class="modal-head"><h3>Masa Ekle / Düzenle</h3><button class="modal-x" onclick="closeModal('masaModal')">✕</button></div>
     <div class="modal-body">
       <div class="form-row-2">
-        <div class="form-row"><div class="form-label">Masa No</div><input class="form-input" id="mNo" type="number" placeholder="12"></div>
+        <div class="form-row"><div class="form-label">Masa No</div><input class="form-input" id="mNo" type="number" placeholder="13" oninput="document.getElementById('masaQRUrl').textContent=this.value||'?'"></div>
         <div class="form-row"><div class="form-label">İsim / Bölge</div><input class="form-input" id="mName" placeholder="Bahçe A3"></div>
       </div>
       <div class="form-row"><div class="form-label">Kapasite</div>
-        <select class="form-input" id="mCap"><option>2 Kişilik</option><option>4 Kişilik</option><option>6 Kişilik</option><option>8 Kişilik</option></select></div>
-      <div style="background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center">
-        <div style="font-size:40px;margin-bottom:8px">📱</div>
-        <div style="font-size:12px;color:var(--muted)">QR kod kaydet sonrasında oluşturulacak</div>
-        <div style="font-size:11px;color:var(--muted);margin-top:4px">URL: index.html?masa=<span id="masaQRUrl">?</span></div>
+        <select class="form-input" id="mCap"><option>2 Kişilik</option><option selected>4 Kişilik</option><option>6 Kişilik</option><option>8 Kişilik</option></select></div>
+      <div style="background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center">
+        <div style="font-size:32px;margin-bottom:6px">📱</div>
+        <div style="font-size:11px;font-weight:600;margin-bottom:3px">QR Kod URL</div>
+        <div style="font-family:var(--mono);font-size:11px;color:var(--muted)">index.html?masa=<span id="masaQRUrl">?</span></div>
       </div>
     </div>
     <div class="modal-foot">
@@ -584,20 +845,95 @@ a{color:inherit;text-decoration:none}
   </div>
 </div>
 
+<div class="modal-bg" id="menuAddModal" onclick="if(event.target===this)closeModal('menuAddModal')">
+  <div class="modal">
+    <div class="modal-head"><h3>Yeni Ürün Ekle</h3><button class="modal-x" onclick="closeModal('menuAddModal')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-row"><div class="form-label">Ürün Adı</div><input class="form-input" id="mnName" placeholder="Kumpir Spesyal"></div>
+      <div class="form-row-2">
+        <div class="form-row"><div class="form-label">Kategori</div>
+          <select class="form-input" id="mnCat"><option value="kumpir">🥔 Kumpir</option><option value="burger">🍔 Burger</option><option value="waffle">🧇 Waffle</option><option value="drink">🥤 İçecek</option></select></div>
+        <div class="form-row"><div class="form-label">Fiyat (₺)</div><input class="form-input" id="mnPrice" type="number" placeholder="149"></div>
+      </div>
+      <div class="form-row"><div class="form-label">Görsel URL</div><input class="form-input" id="mnImg" placeholder="https://..."></div>
+    </div>
+    <div class="modal-foot">
+      <button class="modal-cancel" onclick="closeModal('menuAddModal')">İptal</button>
+      <button class="modal-save" onclick="saveNewMenuItem()">💾 Kaydet</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="logoutModal" onclick="if(event.target===this)closeModal('logoutModal')">
+  <div class="modal" style="max-width:360px">
+    <div class="modal-head"><h3>Çıkış Onayı</h3><button class="modal-x" onclick="closeModal('logoutModal')">✕</button></div>
+    <div class="modal-body">
+      <div style="text-align:center;padding:10px 0">
+        <div style="font-size:40px;margin-bottom:12px">👋</div>
+        <div style="font-size:14px;font-weight:600;margin-bottom:6px">Çıkış yapmak istiyor musunuz?</div>
+        <div style="font-size:12px;color:var(--muted)">Oturum kapatılacak ve giriş ekranına yönlendirileceksiniz.</div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="modal-cancel" onclick="closeModal('logoutModal')">Vazgeç</button>
+      <button class="modal-save" style="background:rgba(239,68,68,.8)" onclick="confirmLogout()">⏻ Çıkış Yap</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
-
 <script>
-// ── DATA ──
-let USERS_DATA = [
-  {id:1, name:'Admin Kullanıcı', username:'admin', role:'admin', active:true, lastLogin:'Az önce'},
-  {id:2, name:'Patron Hesabı', username:'patron', role:'patron', active:true, lastLogin:'1 saat önce'},
-  {id:3, name:'İşletme Müdürü', username:'isletme', role:'super', active:true, lastLogin:'3 saat önce'},
-  {id:4, name:'Mutfak Ekibi', username:'mutfak', role:'kitchen', active:true, lastLogin:'Bugün'},
-  {id:5, name:'Garson 1', username:'garson', role:'waiter', active:true, lastLogin:'Bugün'},
-  {id:6, name:'Vale Servisi', username:'vale', role:'valet', active:false, lastLogin:'Dün'},
+// ── AUTH ──
+const ACCOUNTS=[
+  {user:'admin',pass:'atom2024',name:'Admin',sub:'atom2024'},
+  {user:'patron',pass:'patron2024',name:'Patron',sub:'patron2024'},
+  {user:'isletme',pass:'isletme24',name:'İşletme Müdürü',sub:'isletme24'},
 ];
+function doLogin(){
+  var u=document.getElementById('loginUser').value.trim();
+  var p=document.getElementById('loginPass').value;
+  var acct=null;
+  for(var i=0;i<ACCOUNTS.length;i++){if(ACCOUNTS[i].user===u&&ACCOUNTS[i].pass===p){acct=ACCOUNTS[i];break;}}
+  if(!acct){
+    var err=document.getElementById('loginError');
+    err.style.display='block';
+    document.getElementById('loginPass').value='';
+    setTimeout(function(){err.style.display='none';},3000);
+    return;
+  }
+  document.getElementById('loginOverlay').style.display='none';
+  var sh=document.getElementById('appShell');
+  sh.style.display='flex';
+  sh.style.opacity='1';
+  document.getElementById('sbUserName').textContent=acct.name;
+  document.getElementById('sbUserSub').textContent=acct.sub;
+  initApp();
+}
+function doLogout(){openModal('logoutModal');}
+function confirmLogout(){
+  var sh=document.getElementById('appShell');
+  sh.style.opacity='0';sh.style.transition='opacity .3s';
+  setTimeout(function(){
+    sh.style.display='none';
+    var ov=document.getElementById('loginOverlay');
+    ov.style.display='flex';ov.style.opacity='0';
+    setTimeout(function(){ov.style.opacity='1';ov.style.transition='opacity .3s'},10);
+    document.getElementById('loginUser').value='';
+    document.getElementById('loginPass').value='';
+    closeModal('logoutModal');
+  },300);
+}
 
-let MENU_DATA = [
+// ── DATA ──
+var USERS_DATA=[
+  {id:1,name:'Admin Kullanıcı',username:'admin',role:'admin',active:true,lastLogin:'Az önce'},
+  {id:2,name:'Patron Hesabı',username:'patron',role:'patron',active:true,lastLogin:'1 saat önce'},
+  {id:3,name:'İşletme Müdürü',username:'isletme',role:'super',active:true,lastLogin:'3 saat önce'},
+  {id:4,name:'Mutfak Ekibi',username:'mutfak',role:'kitchen',active:true,lastLogin:'Bugün'},
+  {id:5,name:'Garson 1',username:'garson',role:'waiter',active:true,lastLogin:'Bugün'},
+  {id:6,name:'Vale Servisi',username:'vale',role:'valet',active:false,lastLogin:'Dün'},
+];
+var MENU_DATA=[
   {id:1,name:'Kumpir Klasik',cat:'kumpir',price:149,img:'https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=400&q=80&auto=format&fit=crop',available:true},
   {id:2,name:'Kumpir Spesyal',cat:'kumpir',price:179,img:'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=400&q=80&auto=format&fit=crop',available:true},
   {id:3,name:'Smash Burger',cat:'burger',price:189,img:'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&q=80&auto=format&fit=crop',available:true},
@@ -606,276 +942,436 @@ let MENU_DATA = [
   {id:6,name:'Waffle Tatlı',cat:'waffle',price:139,img:'https://images.unsplash.com/photo-1562376552-0d160a2f238d?w=400&q=80&auto=format&fit=crop',available:true},
   {id:7,name:'Limonata',cat:'drink',price:65,img:'https://images.unsplash.com/photo-1621263764928-df1444c5e859?w=400&q=80&auto=format&fit=crop',available:true},
 ];
-
-let MASALAR = Array.from({length:12},(_, i)=>({id:i+1,no:i+1,name:'Masa '+(i+1),cap:'4 Kişilik',dolu:Math.random()>.5}));
-
-const INTEGRATIONS = [
+var MASALAR=Array.from({length:12},function(_,i){return{id:i+1,no:i+1,name:'Masa '+(i+1),cap:'4 Kişilik',dolu:Math.random()>.5}});
+var INTEGRATIONS=[
   {name:'Trendyol Yemek',ico:'🟠',color:'#FDBA74',connected:true,orders:68,sync:'14:23'},
   {name:'Getir Yemek',ico:'🟣',color:'#C4B5FD',connected:true,orders:52,sync:'14:21'},
   {name:'Yemeksepeti',ico:'🔴',color:'#F9A8D4',connected:true,orders:41,sync:'14:20'},
   {name:'Migros Yemek',ico:'🟡',color:'#FCD34D',connected:false,orders:0,sync:'-'},
 ];
-
-const COURIERS = [
+var COURIERS=[
   {name:'Kurye Platformu',ico:'🛵',color:'#86EFAC',connected:true,active:4,sync:'Canlı'},
   {name:'HepsiJet',ico:'📦',color:'#93C5FD',connected:false,active:0,sync:'-'},
-  {name:'Sendeo',ico:'🚚',color:'#FDBA74',connected:false,active:0,sync:'-'},
 ];
-
-const ERP_LIST = [
+var ERP_LIST=[
   {name:'Logo Tiger',ico:'🏢',color:'#93C5FD',connected:false},
   {name:'SAP Business One',ico:'💼',color:'#FDBA74',connected:false},
   {name:'Mikro ERP',ico:'📊',color:'#86EFAC',connected:false},
   {name:'WooCommerce B2C',ico:'🛒',color:'#C4B5FD',connected:true},
 ];
+var PERMISSIONS=['Dashboard','Siparişler','Menü','Stok','Raporlar','Masa','Kullanıcılar','Entegrasyon','Ödeme'];
+var menuFilter='all';
 
-const PERMISSIONS = ['Dashboard','Siparişler','Menü','Stok','Raporlar','Masa','Kullanıcılar','Entegrasyon','Ödeme'];
-
-let menuFilter = 'all';
-
-// ── RENDER USERS ──
-function renderUsers() {
-  const roleTags = {admin:'rt-admin',patron:'rt-patron',super:'rt-super',kitchen:'rt-kitchen',waiter:'rt-waiter',valet:'rt-valet'};
-  const roleNames = {admin:'🛡️ Admin',patron:'👑 Patron',super:'📊 Süpervizör',kitchen:'🍳 Mutfak',waiter:'🧑‍🍽️ Garson',valet:'🚗 Vale'};
-  document.getElementById('usersTable').innerHTML = `
-    <thead><tr>
-      <th>Kullanıcı</th><th>Kullanıcı Adı</th><th>Rol</th><th>Durum</th><th>Son Giriş</th><th>İşlem</th>
-    </tr></thead>
-    <tbody>${USERS_DATA.map(u=>`<tr>
-      <td><strong>${u.name}</strong></td>
-      <td style="font-family:var(--mono);font-size:12px">${u.username}</td>
-      <td><span class="role-tag ${roleTags[u.role]}">${roleNames[u.role]}</span></td>
-      <td><span class="status-dot ${u.active?'sd-on':'sd-off'}"></span>${u.active?'Aktif':'Pasif'}</td>
-      <td style="color:var(--muted);font-size:12px">${u.lastLogin}</td>
-      <td><div class="action-btns">
-        <button class="act" onclick="editUser(${u.id})">✏️ Düzenle</button>
-        <button class="act" onclick="showToast('🔑 Şifre sıfırlandı')">🔑</button>
-        <button class="act del" onclick="deleteUser(${u.id})">🗑</button>
-      </div></td>
-    </tr>`).join('')}</tbody>`;
+function initApp(){
+  renderUsers();renderMenu();renderMasalar();
+  renderMenuBarcodeList();renderPLTable();
+  renderIntGrid(INTEGRATIONS,'intGrid');
+  renderIntGrid(COURIERS,'courierGrid');
+  renderIntGrid(ERP_LIST,'erpGrid');
+  renderReportCharts();
 }
 
-// ── RENDER MENU ──
-function renderMenu() {
-  const f = menuFilter==='all' ? MENU_DATA : MENU_DATA.filter(i=>i.cat===menuFilter);
-  document.getElementById('menuGrid').innerHTML = f.map(item=>`
-    <div class="menu-card">
-      <div class="mc-img">
-        <img src="${item.img}" alt="${item.name}" loading="lazy" ${!item.available?'style="filter:grayscale(80%)"':''}>
-        ${!item.available?'<div class="mc-badge" style="background:rgba(239,68,68,.8);color:#fff">STOK YOK</div>':''}
-      </div>
-      <div class="mc-body">
-        <div class="mc-name">${item.name}</div>
-        <div class="mc-cat">${item.cat}</div>
-        <div class="mc-foot">
-          <span class="mc-price" onclick="showToast('Fiyat düzenleniyor: ₺${item.price}')">₺${item.price}</span>
-          <div class="mc-toggle" onclick="toggleMenuItem(${item.id})">
-            <button class="tog ${item.available?'on':'off'}" id="mt-${item.id}"></button>
-            <span style="font-size:11px;font-weight:600;color:${item.available?'#4ADE80':'#EF4444'}">${item.available?'Aktif':'Kapalı'}</span>
-          </div>
-        </div>
-      </div>
-    </div>`).join('');
+// ── USERS ──
+function renderUsers(){
+  var rt={admin:'rt-admin',patron:'rt-patron',super:'rt-super',kitchen:'rt-kitchen',waiter:'rt-waiter',valet:'rt-valet'};
+  var rn={admin:'🛡️ Admin',patron:'👑 Patron',super:'📊 Süpervizör',kitchen:'🍳 Mutfak',waiter:'🧑‍🍽️ Garson',valet:'🚗 Vale'};
+  document.getElementById('usersTable').innerHTML='<thead><tr><th>Kullanıcı</th><th>Kullanıcı Adı</th><th>Rol</th><th>Durum</th><th>Son Giriş</th><th>İşlem</th></tr></thead><tbody>'+
+    USERS_DATA.map(function(u){return '<tr><td><strong>'+u.name+'</strong></td><td style="font-family:var(--mono);font-size:12px">'+u.username+'</td><td><span class="role-tag '+rt[u.role]+'">'+rn[u.role]+'</span></td><td><span class="status-dot '+(u.active?'sd-on':'sd-off')+'"></span>'+(u.active?'Aktif':'Pasif')+'</td><td style="color:var(--muted);font-size:12px">'+u.lastLogin+'</td><td><div class="action-btns"><button class="act" onclick="editUser('+u.id+')">✏️ Düzenle</button><button class="act" onclick="toggleUserStatus('+u.id+')">'+(u.active?'🔒':'🔓')+'</button><button class="act del" onclick="deleteUser('+u.id+')">🗑</button></div></td></tr>';}).join('')+'</tbody>';
+  document.getElementById('userCount').textContent=USERS_DATA.length+' kullanıcı';
 }
-
-function filterCat(cat, el) {
-  menuFilter = cat;
-  document.querySelectorAll('#catFilterBar .act').forEach(b=>b.style.background='');
-  el.style.background='rgba(255,255,255,.08)';
-  renderMenu();
-}
-
-function toggleMenuItem(id) {
-  const item = MENU_DATA.find(i=>i.id===id);
-  item.available = !item.available;
-  renderMenu();
-  showToast(`${item.available?'🟢':'🔴'} "${item.name}" ${item.available?'açıldı':'kapatıldı'}`);
-}
-
-function toggleAllMenu(on) {
-  MENU_DATA.forEach(i=>i.available=on);
-  renderMenu();
-  showToast(on?'🟢 Tüm ürünler açıldı':'🔴 Tüm ürünler kapatıldı');
-}
-
-// ── RENDER MASALAR ──
-function renderMasalar() {
-  document.getElementById('masaGrid').innerHTML = MASALAR.map(m=>`
-    <div class="masa-card ${m.dolu?'dolu':'bos'}">
-      <div class="masa-no">${m.no}</div>
-      <div class="masa-name">${m.name}</div>
-      <span class="masa-status ${m.dolu?'ms-dolu':'ms-bos'}">${m.dolu?'🔴 Dolu':'🟢 Boş'}</span>
-      <div class="masa-qr">
-        <button class="qr-btn" onclick="showQR(${m.id})">📱 QR Göster</button>
-      </div>
-    </div>`).join('');
-}
-
-function showQR(id) {
-  const m = MASALAR.find(x=>x.id===id);
-  showToast(`📱 QR: index.html?masa=${m.no}`);
-}
-
-function printAllQR() { showToast('🖨️ Tüm QR kodlar yazdırılıyor...'); }
-
-// ── RENDER INTEGRATIONS ──
-function renderIntGrid(data, containerId) {
-  document.getElementById(containerId).innerHTML = data.map((a,i)=>`
-    <div class="int-card">
-      <div class="int-top">
-        <span class="int-name" style="color:${a.color}">${a.ico} ${a.name}</span>
-        <span class="int-status ${a.connected?'conn':'disconn'}">${a.connected?'● Bağlı':'● Bağlı Değil'}</span>
-      </div>
-      <div class="form-label" style="margin-bottom:5px">API Key</div>
-      <input class="field-mini" type="password" value="${a.connected?'••••••••••KEY':''}">
-      <div class="form-label" style="margin-bottom:5px">Restoran ID</div>
-      <input class="field-mini" value="${a.connected?'ATM-00'+Math.floor(Math.random()*9999):''}">
-      ${a.connected?`<div style="font-size:11px;color:var(--muted);margin-bottom:8px">Sipariş: ${a.orders} · Son sync: ${a.sync}</div>`:''}
-      <div class="int-actions">
-        ${a.connected
-          ?`<button class="int-btn ib-sync" onclick="showToast('🔄 ${a.name} sync...')">🔄 Sync</button>
-            <button class="int-btn ib-test" onclick="showToast('🧪 Test OK')">Test</button>
-            <button class="int-btn ib-disc" onclick="showToast('❌ Bağlantı kesildi')">Kes</button>`
-          :`<button class="int-btn ib-conn" onclick="showToast('🔌 ${a.name} bağlanıyor...')" style="flex:1">🔌 Bağlan</button>`
-        }
-      </div>
-    </div>`).join('');
-}
-
-function syncAllAPIs() {
-  showToast('🔄 Tüm pazaryerleri sync ediliyor...');
-  setTimeout(()=>showToast('✅ Tüm sync tamamlandı!'), 2000);
-}
-
-// ── RENDER REPORTS CHARTS ──
-function renderReportCharts() {
-  const channels = [{n:'Trendyol',v:68,c:'#FDBA74'},{n:'Getir',v:52,c:'#C4B5FD'},{n:'Yemeksepeti',v:41,c:'#F9A8D4'},{n:'Masa',v:87,c:'#FF6B3D'}];
-  const total = channels.reduce((a,b)=>a+b.v,0);
-  document.getElementById('channelChart').innerHTML = channels.map(c=>`
-    <div style="margin-bottom:12px">
-      <div style="display:flex;justify-content:space-between;margin-bottom:5px">
-        <span style="font-size:12px;font-weight:600">${c.n}</span>
-        <span style="font-family:var(--mono);font-size:12px;color:${c.c}">%${Math.round(c.v/total*100)}</span>
-      </div>
-      <div style="height:6px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden">
-        <div style="height:100%;width:${c.v/total*100}%;background:${c.c};border-radius:3px;transition:width .6s"></div>
-      </div>
-    </div>`).join('');
-
-  const expenses = [{n:'Malzeme',v:45,c:'#EF4444'},{n:'Personel',v:30,c:'#F59E0B'},{n:'Kira',v:12,c:'#3B82F6'},{n:'Diğer',v:13,c:'#6B7280'}];
-  const etot = expenses.reduce((a,b)=>a+b.v,0);
-  document.getElementById('expenseChart').innerHTML = expenses.map(e=>`
-    <div style="margin-bottom:12px">
-      <div style="display:flex;justify-content:space-between;margin-bottom:5px">
-        <span style="font-size:12px;font-weight:600">${e.n}</span>
-        <span style="font-family:var(--mono);font-size:12px;color:${e.c}">%${e.v}</span>
-      </div>
-      <div style="height:6px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden">
-        <div style="height:100%;width:${e.v}%;background:${e.c};border-radius:3px"></div>
-      </div>
-    </div>`).join('');
-}
-
-// ── MODALS ──
-function openUserModal() {
-  document.getElementById('userModalTitle').textContent = 'Yeni Kullanıcı';
-  document.getElementById('uName').value='';
-  document.getElementById('uUsername').value='';
-  document.getElementById('uPass').value='';
-  document.getElementById('permGrid').innerHTML = PERMISSIONS.map((p,i)=>`
-    <div class="perm-item" onclick="togglePerm(this)">
-      <div class="perm-check ${i<4?'checked':''}">${i<4?'✓':''}</div>
-      <span class="perm-name">${p}</span>
-    </div>`).join('');
+function openUserModal(){
+  document.getElementById('userModalTitle').textContent='Yeni Kullanıcı';
+  ['uName','uUsername','uPass'].forEach(function(id){document.getElementById(id).value='';});
+  document.getElementById('permGrid').innerHTML=PERMISSIONS.map(function(p,i){
+    var cls=i<4?' checked':'';
+    var chk=i<4?'&#10003;':'';
+    return '<div class="perm-item" onclick="togglePerm(this)"><div class="perm-check'+cls+'">'+chk+'</div><span class="perm-name">'+p+'</span></div>';
+  }).join('');
   openModal('userModal');
 }
-
-function togglePerm(el) {
-  const ch = el.querySelector('.perm-check');
-  const on = ch.classList.toggle('checked');
-  ch.textContent = on ? '✓' : '';
+function togglePerm(el){var ch=el.querySelector('.perm-check');var on=ch.classList.toggle('checked');ch.textContent=on?'✓':'';}
+function saveUser(){
+  var name=document.getElementById('uName').value.trim();
+  var user=document.getElementById('uUsername').value.trim();
+  if(!name||!user){showToast('⚠️ Ad ve kullanıcı adı zorunlu');return;}
+  USERS_DATA.push({id:Date.now(),name:name,username:user,role:document.getElementById('uRole').value,active:true,lastLogin:'Az önce'});
+  renderUsers();closeModal('userModal');showToast('✅ Kullanıcı eklendi');
+}
+function editUser(id){
+  var u=USERS_DATA.filter(function(x){return x.id===id;})[0];
+  document.getElementById('userModalTitle').textContent='Düzenle: '+u.name;
+  document.getElementById('uName').value=u.name;
+  document.getElementById('uUsername').value=u.username;
+  document.getElementById('uRole').value=u.role;
+  document.getElementById('permGrid').innerHTML=PERMISSIONS.map(function(p){return '<div class="perm-item" onclick="togglePerm(this)"><div class="perm-check checked">✓</div><span class="perm-name">'+p+'</span></div>';}).join('');
+  openModal('userModal');
+}
+function toggleUserStatus(id){
+  var u=USERS_DATA.filter(function(x){return x.id===id;})[0];
+  u.active=!u.active;renderUsers();
+  showToast((u.active?'🔓 ':' 🔒 ')+u.name+(u.active?' aktif edildi':' pasife alındı'));
+}
+function deleteUser(id){
+  if(!confirm('Kullanıcıyı silmek istiyor musunuz?'))return;
+  USERS_DATA=USERS_DATA.filter(function(u){return u.id!==id;});
+  renderUsers();showToast('🗑 Kullanıcı silindi');
 }
 
-function saveUser() {
-  const name = document.getElementById('uName').value.trim();
-  if (!name) { showToast('⚠️ Ad soyad zorunlu'); return; }
-  showToast('✅ Kullanıcı kaydedildi');
-  closeModal('userModal');
-  renderUsers();
+// ── MENU ──
+function renderMenu(){
+  var f=menuFilter==='all'?MENU_DATA:MENU_DATA.filter(function(i){return i.cat===menuFilter;});
+  document.getElementById('menuGrid').innerHTML=f.map(function(item){return '<div class="menu-card"><div class="mc-img"><img src="'+item.img+'" alt="'+item.name+'" loading="lazy" '+(item.available?'':'style="filter:grayscale(80%)"')+'>'+(item.available?'':'<div class="mc-badge" style="color:#fff">STOK YOK</div>')+'</div><div class="mc-body"><div class="mc-name">'+item.name+'</div><div class="mc-cat">'+item.cat+'</div><div class="mc-foot"><span class="mc-price" onclick="editPrice('+item.id+')">₺'+item.price+'</span><div class="mc-toggle" onclick="toggleMenuItem('+item.id+')"><button class="tog '+(item.available?'on':'off')+'"></button><span style="font-size:11px;font-weight:600;color:'+(item.available?'#4ADE80':'#EF4444')+'">'+(item.available?'Aktif':'Kapalı')+'</span></div></div></div></div>';}).join('');
+}
+function filterCat(cat,el){
+  menuFilter=cat;
+  document.querySelectorAll('#catFilterBar .act').forEach(function(b){b.style.background='';b.style.color='';});
+  el.style.background='rgba(255,255,255,.08)';el.style.color='var(--text)';
+  renderMenu();
+}
+function toggleMenuItem(id){
+  var item=MENU_DATA.filter(function(i){return i.id===id;})[0];
+  item.available=!item.available;renderMenu();
+  showToast((item.available?'🟢':'🔴')+' "'+item.name+'" '+(item.available?'açıldı':'kapatıldı'));
+}
+function toggleAllMenu(on){MENU_DATA.forEach(function(i){i.available=on;});renderMenu();showToast(on?'🟢 Tüm ürünler açıldı':'🔴 Tüm ürünler kapatıldı');}
+function editPrice(id){
+  var item=MENU_DATA.filter(function(i){return i.id===id;})[0];
+  var np=prompt('"'+item.name+'" için yeni fiyat:',item.price);
+  if(np&&!isNaN(np)&&np>0){item.price=parseInt(np);renderMenu();showToast('💰 Fiyat güncellendi: ₺'+item.price);}
+}
+function openAddMenuModal(){openModal('menuAddModal');}
+function saveNewMenuItem(){
+  var name=document.getElementById('mnName').value.trim();
+  var price=parseInt(document.getElementById('mnPrice').value);
+  if(!name||!price){showToast('⚠️ Ad ve fiyat zorunlu');return;}
+  var img=document.getElementById('mnImg').value||'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&q=80&auto=format&fit=crop';
+  MENU_DATA.push({id:Date.now(),name:name,cat:document.getElementById('mnCat').value,price:price,img:img,available:true});
+  renderMenu();renderMenuBarcodeList();closeModal('menuAddModal');showToast('✅ Ürün eklendi: '+name);
 }
 
-function editUser(id) { showToast('✏️ Düzenleme modu: Kullanıcı #'+id); }
-function deleteUser(id) {
-  if(confirm('Kullanıcıyı silmek istiyor musunuz?')) {
-    USERS_DATA = USERS_DATA.filter(u=>u.id!==id);
-    renderUsers();
-    showToast('🗑 Kullanıcı silindi');
-  }
+// ── MASALAR ──
+function renderMasalar(){
+  document.getElementById('masaGrid').innerHTML=MASALAR.map(function(m){return '<div class="masa-card '+(m.dolu?'dolu':'bos')+'" onclick="toggleMasa('+m.id+')"><div class="masa-no">'+m.no+'</div><div class="masa-name">'+m.name+'</div><span class="masa-status '+(m.dolu?'ms-dolu':'ms-bos')+'">'+(m.dolu?'🔴 Dolu':'🟢 Boş')+'</span><div class="masa-qr"><button class="qr-btn" onclick="event.stopPropagation();showToast(\'📱 QR: index.html?masa='+m.no+' · Yazdırılıyor...\')">📱 QR</button><button class="qr-btn" onclick="event.stopPropagation();editMasa('+m.id+')">✏️</button></div></div>';}).join('');
 }
-
-function openMasaModal() {
+function toggleMasa(id){
+  var m=MASALAR.filter(function(x){return x.id===id;})[0];
+  m.dolu=!m.dolu;renderMasalar();
+  showToast(m.name+': '+(m.dolu?'🔴 Dolu':'🟢 Boş')+' işaretlendi');
+}
+function editMasa(id){
+  var m=MASALAR.filter(function(x){return x.id===id;})[0];
+  document.getElementById('mNo').value=m.no;
+  document.getElementById('mName').value=m.name;
+  document.getElementById('masaQRUrl').textContent=m.no;
+  openModal('masaModal');
+}
+function openMasaModal(){
   document.getElementById('mNo').value='';
   document.getElementById('mName').value='';
   document.getElementById('masaQRUrl').textContent='?';
-  document.getElementById('mNo').oninput = function(){ document.getElementById('masaQRUrl').textContent=this.value||'?'; };
   openModal('masaModal');
 }
-
-function saveMasa() {
-  const no = document.getElementById('mNo').value;
-  const name = document.getElementById('mName').value || 'Masa '+no;
-  if (!no) { showToast('⚠️ Masa no zorunlu'); return; }
-  MASALAR.push({id:Date.now(),no:parseInt(no),name,cap:'4 Kişilik',dolu:false});
-  renderMasalar();
-  closeModal('masaModal');
-  showToast('✅ Masa eklendi · QR oluşturuldu');
+function saveMasa(){
+  var no=document.getElementById('mNo').value;
+  var name=document.getElementById('mName').value||'Masa '+no;
+  if(!no){showToast('⚠️ Masa no zorunlu');return;}
+  MASALAR.push({id:Date.now(),no:parseInt(no),name:name,cap:document.getElementById('mCap').value,dolu:false});
+  renderMasalar();closeModal('masaModal');showToast('✅ Masa '+no+' eklendi · QR oluşturuldu');
 }
 
-function openMenuModal() { showToast('Menü ekleme modalı (isletme-paneli.html ile entegre)'); }
+// ── BARCODE ──
+function generateBarcode(){
+  var c=document.getElementById('barcodeContent').value||'';
+  var t=document.getElementById('barcodeType').value;
+  var icons={'EAN-13':'|||','QR Code':'▦','Code 128':'▌▌▌','Data Matrix':'▩'};
+  document.getElementById('barcodeVisual').textContent=icons[t]||'📊';
+  document.getElementById('barcodePreview').textContent=c?c.toUpperCase().substring(0,14).split('').join(' '):'_ _ _ _ _ _ _';
+  document.getElementById('barcodeLabel').textContent=c?t+' · '+document.getElementById('barcodeQty').value+' adet':'İçerik girin';
+}
+function renderMenuBarcodeList(){
+  document.getElementById('menuBarcodeList').innerHTML=MENU_DATA.map(function(item){return '<div style="display:flex;align-items:center;gap:12px;padding:10px 14px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px"><img src="'+item.img+'" style="width:36px;height:36px;border-radius:6px;object-fit:cover"><div style="flex:1"><div style="font-size:12px;font-weight:700">'+item.name+'</div><div style="font-size:10px;color:var(--muted);font-family:var(--mono)">₺'+item.price+' · '+item.cat+'</div></div><button class="act" onclick="showToast(\'🖨️ '+item.name+' EAN-13 yazdırıldı\')">🖨️ EAN-13</button><button class="act" onclick="showToast(\'📱 '+item.name+' QR yazdırıldı\')">📱 QR</button></div>';}).join('');
+}
 
-function openModal(id) { document.getElementById(id).classList.add('open'); }
-function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+// ── INTEGRATIONS ──
+function renderIntGrid(data,cid){
+  var html='';
+  data.forEach(function(a){
+    var conn=a.connected;
+    html+='<div class="int-card"><div class="int-top">';
+    html+='<span class="int-name" style="color:'+a.color+'">'+a.ico+' '+a.name+'</span>';
+    html+=conn?'<span class="int-status conn">&#9679; Bagli</span>':'<span class="int-status disconn">&#9679; Bagli Degil</span>';
+    html+='</div>';
+    html+='<div class="form-label" style="margin-bottom:5px">API Key</div>';
+    html+='<input class="field-mini" type="password" value="'+(conn?'KEY_HIDDEN':'')+'">';
+    html+='<div class="form-label" style="margin-bottom:5px">Restoran ID</div>';
+    html+='<input class="field-mini" value="'+(conn?'ATM-00'+Math.floor(Math.random()*999):'')+'">';
+    html+='<div class="int-actions">';
+    if(conn){
+      html+="<button class=\"int-btn ib-sync\" onclick=\"showToast('Sync OK')\">Sync</button>";
+      html+="<button class=\"int-btn ib-test\" onclick=\"showToast('Test OK')\">Test</button>";
+      html+="<button class=\"int-btn ib-disc\" onclick=\"showToast('Kesildi')\">Kes</button>";
+    } else {
+      html+="<button class=\"int-btn ib-conn\" style=\"flex:1\" onclick=\"showToast('Baglaniliyor')\">Baglan</button>";
+    }
+    html+='</div></div>';
+  });
+  document.getElementById(cid).innerHTML=html;
+}
+
+function syncAllAPIs(){showToast('🔄 Tüm pazaryerleri sync ediliyor...');setTimeout(function(){showToast('✅ Sync tamamlandı!');},2000);}
+
+// ── E-FATURA ──
+function connectEFatura(){
+  document.getElementById('efaturaStatus').innerHTML='<span style="color:var(--green)">● Bağlandı</span> · Son: 07.03.2026 · UUID: GIB20260307001';
+  showToast('✅ e-Fatura GİB bağlantısı aktif');
+}
+function testEFatura(){
+  document.getElementById('efaturaStatus').innerHTML='<span style="color:var(--amber)">⏳ Test faturası gönderildi...</span>';
+  setTimeout(function(){document.getElementById('efaturaStatus').innerHTML='<span style="color:var(--green)">✅ Test faturası onaylandı · UUID: TF20260307001</span>';},1500);
+}
+function connectPOS(){
+  var tid=document.getElementById('posTerminal').value;
+  if(!tid){showToast('⚠️ Terminal ID zorunlu');return;}
+  document.getElementById('posStatus').innerHTML='<span style="color:var(--green)">● POS Bağlı</span> · Terminal: '+tid+' · Günlük limit: ₺50.000';
+  showToast('✅ POS terminali bağlandı');
+}
+
+// ── REPORTS ──
+function renderReportCharts(){
+  var ch=[{n:'Masa',v:87,c:'#FF6B3D'},{n:'Trendyol',v:68,c:'#FDBA74'},{n:'Getir',v:52,c:'#C4B5FD'},{n:'Yemeksepeti',v:41,c:'#F9A8D4'}];
+  var tot=ch.reduce(function(a,b){return a+b.v;},0);
+  document.getElementById('channelChart').innerHTML=ch.map(function(c){return '<div style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;margin-bottom:5px"><span style="font-size:12px;font-weight:600">'+c.n+'</span><span style="font-family:var(--mono);font-size:12px;color:'+c.c+'">%'+Math.round(c.v/tot*100)+' · ₺'+Math.round(c.v*1180).toLocaleString('tr')+'</span></div><div style="height:7px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden"><div style="height:100%;width:'+(c.v/tot*100)+'%;background:'+c.c+';border-radius:4px;transition:width .8s"></div></div></div>';}).join('');
+  var ex=[{n:'Hammadde',v:45,c:'#EF4444'},{n:'Personel',v:30,c:'#F59E0B'},{n:'Kira',v:12,c:'#3B82F6'},{n:'Diğer',v:13,c:'#6B7280'}];
+  document.getElementById('expenseChart').innerHTML=ex.map(function(e){return '<div style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;margin-bottom:5px"><span style="font-size:12px;font-weight:600">'+e.n+'</span><span style="font-family:var(--mono);font-size:12px;color:'+e.c+'">%'+e.v+' · ₺'+Math.round(e.v*2150).toLocaleString('tr')+'</span></div><div style="height:7px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden"><div style="height:100%;width:'+e.v+'%;background:'+e.c+';border-radius:4px"></div></div></div>';}).join('');
+}
+function renderPLTable(){
+  var rows=[
+    {lbl:'GELİR',items:[{n:'🍽️ Masa Satışı',a:'₺102.480',d:'+12%'},{n:'🚴 Teslimat',a:'₺181.520',d:'+22%'}]},
+    {lbl:'GİDER',items:[{n:'🥩 Hammadde',a:'₺96.750',d:'-2%'},{n:'👥 Personel',a:'₺64.500',d:'='},{n:'🏠 Kira',a:'₺25.800',d:'='},{n:'📦 Paket',a:'₺12.400',d:'+4%'},{n:'⚡ Enerji',a:'₺9.200',d:'+8%'},{n:'💳 Komisyon',a:'₺6.350',d:'+3%'}]},
+    {lbl:'SONUÇ',items:[{n:'📊 Brüt Kar',a:'₺68.400',d:'+18%',h:true},{n:'🏛️ KDV Yükümlülüğü',a:'₺25.600',d:''},{n:'✨ Net Kar',a:'₺42.800',d:'%24 marj',h:true}]},
+  ];
+  var html='<thead><tr><th>Kalem</th><th style="text-align:right">Tutar</th><th style="text-align:right">Değişim</th></tr></thead><tbody>';
+  rows.forEach(function(s){
+    html+='<tr><td colspan="3" style="background:rgba(255,255,255,.04);font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--muted);padding:8px 14px">'+s.lbl+'</td></tr>';
+    s.items.forEach(function(r){
+      html+='<tr style="'+(r.h?'background:rgba(232,57,14,.05)':'')+'"><td style="'+(r.h?'font-weight:800':'')+'">'+r.n+'</td><td style="text-align:right;font-family:var(--mono);font-weight:700;'+(r.h?'color:var(--red)':'')+'">'+r.a+'</td><td style="text-align:right;font-size:11px;color:'+(r.d.startsWith('+')?'var(--green)':r.d.startsWith('-')?'#EF4444':'var(--muted)')+'">'+r.d+'</td></tr>';
+    });
+  });
+  html+='</tbody>';
+  document.getElementById('plTable').innerHTML=html;
+}
+function setReportPeriod(p,el){
+  document.querySelectorAll('#reportPeriodBar .act').forEach(function(b){b.style.background='';b.style.color='';});
+  el.style.background='rgba(255,255,255,.08)';el.style.color='var(--text)';
+  showToast('📊 '+p.charAt(0).toUpperCase()+p.slice(1)+' rapor yükleniyor...');
+}
+
+// ── KIOSK ──
+var KIOSK_DEVICES=[
+  {id:1,name:'Giriş Kioskı #1',loc:'Ana Giriş',online:true,orders:42},
+  {id:2,name:'Giriş Kioskı #2',loc:'Yan Kapı',online:true,orders:28},
+  {id:3,name:'Bahçe Kioskı',loc:'Dış Bahçe',online:false,orders:0},
+];
+function initKiosk(){
+  document.getElementById('kioskStatusBar').innerHTML=KIOSK_DEVICES.map(function(d){return '<div class="ssb-item"><div class="ssb-dot" style="background:'+(d.online?'var(--green)':'#EF4444')+'"></div><div><div class="ssb-name">'+d.name+'</div><div style="font-size:10px;color:var(--muted)">'+d.loc+'</div></div><div style="margin-left:auto;text-align:right"><div style="font-size:10px;font-weight:700;color:'+(d.online?'var(--green)':'#FCA5A5')+'">'+(d.online?'● Online':'● Offline')+'</div><div style="font-family:var(--mono);font-size:10px;color:var(--muted)">'+(d.online?d.orders+' sipariş':'Bağlantı yok')+'</div></div></div>';}).join('');
+  refreshKioskPreview();
+}
+function refreshKioskPreview(){
+  var welcome=(document.getElementById('kiWelcome')||{}).value||'Hoş Geldiniz! 🧡';
+  var sub=(document.getElementById('kiSub')||{}).value||'Siparişinizi kolayca verin';
+  document.getElementById('kioskPreview').innerHTML='<div class="ki-header"><span class="ki-logo">ATOM</span><span class="ki-time" id="kiClk">--:--</span></div><div class="ki-hero"><img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600&q=80&auto=format&fit=crop"><div class="ki-hero-text"><div class="ki-welcome">'+welcome.toUpperCase()+'</div><div class="ki-sub">'+sub+'</div></div></div><div class="ki-cats"><div class="ki-cat"><div class="ki-cat-ico">🥔</div><div class="ki-cat-name">KUMPİR</div></div><div class="ki-cat"><div class="ki-cat-ico">🍔</div><div class="ki-cat-name">BURGER</div></div><div class="ki-cat"><div class="ki-cat-ico">🧇</div><div class="ki-cat-name">WAFFLE</div></div><div class="ki-cat"><div class="ki-cat-ico">🥤</div><div class="ki-cat-name">İÇECEK</div></div></div><div class="ki-items">'+MENU_DATA.filter(function(m){return m.available;}).slice(0,3).map(function(item){return '<div class="ki-item"><img class="ki-item-img" src="'+item.img.replace('w=400','w=80')+'"><span class="ki-item-name">'+item.name+'</span><span class="ki-item-price">₺'+item.price+'</span></div>';}).join('')+'</div><div class="ki-footer"><span class="ki-cart">🛒 Sepet boş</span><button class="ki-order-btn">SİPARİŞ VER →</button></div>';
+  var ki_tick=setInterval(function(){var e=document.getElementById('kiClk');if(e)e.textContent=new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});else clearInterval(ki_tick);},1000);
+}
+function toggleSw(btn,label){
+  btn.classList.toggle('on');btn.classList.toggle('off');
+  var on=btn.classList.contains('on');
+  showToast((on?'✅':'⛔')+' '+label+' '+(on?'açıldı':'kapatıldı'));
+}
+function setKioskTheme(t,btn){
+  document.querySelectorAll('#kioskThemeGroup .act').forEach(function(b){b.style.background='';b.style.color='';b.style.borderColor='';});
+  btn.style.background='rgba(232,57,14,.15)';btn.style.color='var(--red)';btn.style.borderColor='var(--red)';
+  showToast('🎨 Tema: '+btn.textContent.trim());
+}
+function restartKiosk(){
+  var badge=document.getElementById('kioskBadge');
+  badge.textContent='⏳ BAŞLIYOR';badge.className='screen-badge sb-offline';
+  setTimeout(function(){badge.textContent='● CANLI';badge.className='screen-badge sb-live';showToast('✅ Kiosk yeniden başlatıldı');},2000);
+}
+function shutdownKiosk(){if(confirm('Kioskı kapatmak istiyor musunuz?'))showToast('🔌 Kiosk kapatıldı');}
+function pushKiosk(){showToast('📤 Kiosk güncellendi · '+KIOSK_DEVICES.filter(function(d){return d.online;}).length+' cihaza yayınlandı ✅');}
+
+// ── MENUBOARD ──
+var TV_SCREENS=[
+  {id:1,name:'Giriş TV',loc:'Ana giriş sol',online:true,res:'1920×1080'},
+  {id:2,name:'Kasa TV',loc:'Kasa üstü',online:true,res:'1920×1080'},
+  {id:3,name:'Bahçe TV',loc:'Dış alan',online:false,res:'—'},
+];
+var tvLayoutIdx=0;
+var TV_LAYOUTS=['Öne Çıkan + Liste','Sadece Grid','Full Kampanya','Split 50/50'];
+function initMenuBoard(){
+  document.getElementById('boardStatusBar').innerHTML=TV_SCREENS.map(function(s){return '<div class="ssb-item"><div class="ssb-dot" style="background:'+(s.online?'var(--green)':'#EF4444')+'"></div><div><div class="ssb-name">'+s.name+'</div><div style="font-size:10px;color:var(--muted)">'+s.loc+'</div></div><div style="margin-left:auto;text-align:right"><div style="font-size:10px;font-weight:700;color:'+(s.online?'var(--green)':'#FCA5A5')+'">'+(s.online?'● Online':'● Offline')+'</div><div style="font-family:var(--mono);font-size:10px;color:var(--muted)">'+s.res+'</div></div></div>';}).join('');
+  document.getElementById('connectedScreens').innerHTML=TV_SCREENS.map(function(s){return '<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(255,255,255,.03);border:1px solid '+(s.online?'rgba(34,197,94,.2)':'var(--border)')+';border-radius:10px"><span style="font-size:16px">'+(s.online?'📺':'📵')+'</span><div style="flex:1"><div style="font-size:12px;font-weight:700">'+s.name+'</div><div style="font-size:10px;color:var(--muted)">'+s.loc+' · '+s.res+'</div></div><span style="font-size:10px;font-weight:700;color:'+(s.online?'var(--green)':'#FCA5A5')+'">'+(s.online?'● Online':'● Offline')+'</span>'+(s.online?'<button class="act" onclick="showToast(\'📡 '+s.name+' güncellendi ✅\')">Gönder</button>':'<button class="act" onclick="showToast(\'🔌 Bağlanıyor...\')">Bağlan</button>')+'</div>';}).join('');
+  updateTVPreview();
+}
+function updateTVPreview(){
+  document.getElementById('tvPreview').innerHTML='<div class="tv-ticker"><span class="tv-ticker-txt">⭐ Trendyol ve Getir\'de sipariş verin!&nbsp;&nbsp;&nbsp;&nbsp; 🔥 Smash Burger %10 indirimli&nbsp;&nbsp;&nbsp;&nbsp; 📍 Gebze Merkez · 09:00-23:00&nbsp;&nbsp;&nbsp;&nbsp; 📱 QR ile hızlı sipariş!&nbsp;&nbsp;&nbsp;&nbsp; ⭐ Trendyol ve Getir\'de sipariş verin!</span></div><div class="tv-body"><div class="tv-featured"><img src="https://images.unsplash.com/photo-1586190848861-99aa4a171e90?w=600&q=80&auto=format&fit=crop"><div class="tv-feat-badge">🔥 GÜNÜN MENÜSÜ</div><div class="tv-feat-overlay"><div class="tv-feat-name">Double Smash Burger</div><div class="tv-feat-desc">Fırında pişmiş, bol malzemeli 🧀</div><div class="tv-feat-price">₺239</div></div></div><div class="tv-menu-list">'+MENU_DATA.slice(0,5).map(function(item){return '<div class="tv-menu-item"><img class="tv-mi-img" src="'+item.img.replace('w=400','w=80')+'"><span class="tv-mi-name">'+item.name+'</span><span class="tv-mi-price">₺'+item.price+'</span></div>';}).join('')+'</div></div><div class="tv-footer"><span class="tv-wifi">📶 ATOM_GUEST</span><span class="tv-brand">ATOM Kumpir & Waffle</span><span class="tv-wifi" id="tvClk">--:--</span></div>';
+  var tv_tick=setInterval(function(){var e=document.getElementById('tvClk');if(e)e.textContent=new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});else clearInterval(tv_tick);},1000);
+}
+function cycleTVLayout(){tvLayoutIdx=(tvLayoutIdx+1)%TV_LAYOUTS.length;showToast('⊞ Layout: '+TV_LAYOUTS[tvLayoutIdx]);updateTVPreview();}
+function pushBoard(){showToast('📺 Menü Board güncellendi · '+TV_SCREENS.filter(function(s){return s.online;}).length+' TVye yayınlandı ✅');}
+
+// ── SLIDERS ──
+var SLIDERS=[
+  {id:1,title:'Smash Burger Kampanyası',sub:'Bu hafta %15 indirimli!',type:'promo',img:'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800&q=80&auto=format&fit=crop',targets:['kiosk','board'],duration:6,active:true,order:1},
+  {id:2,title:'Kumpir Spesyal Tanıtım',sub:'Yeni lezzet kombinasyonları',type:'product',img:'https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=800&q=80&auto=format&fit=crop',targets:['kiosk','board','landing'],duration:5,active:true,order:2},
+  {id:3,title:'Waffle Tatlı Serisi',sub:'Taze yapım, bol soslu',type:'product',img:'https://images.unsplash.com/photo-1562376552-0d160a2f238d?w=800&q=80&auto=format&fit=crop',targets:['landing','kiosk'],duration:5,active:true,order:3},
+  {id:4,title:'Hafta Sonu Etkinliği',sub:'Cuma-Pazar özel menü',type:'event',img:'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&q=80&auto=format&fit=crop',targets:['board'],duration:8,active:false,order:4},
+  {id:5,title:'Trendyol & Getir Duyurusu',sub:'Şimdi teslimat platformlarında!',type:'info',img:'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&q=80&auto=format&fit=crop',targets:['kiosk','board','landing'],duration:5,active:true,order:5},
+];
+var sliderFilter='all';
+var currentSlide=0;
+var slideTimer=null;
+function initSliders(){renderSliderList();renderCarousel();startSlideTimer();}
+var typeMap={'promo':['slt-promo','🔥 Promo'],'product':['slt-product','🍔 Ürün'],'event':['slt-event','🎉 Etkinlik'],'info':['slt-info','ℹ️ Bilgi'],'custom':['slt-custom','✏️ Özel']};
+var ticoMap={'kiosk':'🖥️','board':'📺','landing':'🌐'};
+function renderSliderList(){
+  var filtered=sliderFilter==='all'?SLIDERS:SLIDERS.filter(function(s){return s.targets.indexOf(sliderFilter)>-1;});
+  document.getElementById('activeSliderCnt').textContent=filtered.filter(function(s){return s.active;}).length+' aktif / '+filtered.length+' toplam';
+  document.getElementById('sliderList').innerHTML=filtered.map(function(s){
+    var tm=typeMap[s.type]||['slt-custom','Özel'];
+    return '<div class="sl-card '+(s.active?'active-sl':'')+'"><div class="sl-head"><span class="sl-drag">⠿</span><img class="sl-thumb" src="'+s.img+'" onerror="this.style.display=\'none\'"><div class="sl-meta"><div class="sl-name">'+s.title+'</div><div class="sl-detail"><span class="sl-type '+tm[0]+'">'+tm[1]+'</span>'+s.targets.map(function(t){return '<span style="font-size:11px;margin-left:4px">'+ticoMap[t]+'</span>';}).join('')+'<span style="font-size:10px;color:var(--muted);margin-left:4px">· '+s.duration+'sn</span></div></div><div class="sl-controls"><button class="sw '+(s.active?'on':'off')+'" onclick="toggleSlider('+s.id+')"></button><button class="act" onclick="editSlider('+s.id+')" style="padding:4px 7px">✏️</button><button class="act del" onclick="deleteSlider('+s.id+')" style="padding:4px 7px">🗑</button></div></div></div>';
+  }).join('');
+}
+function renderCarousel(){
+  var active=SLIDERS.filter(function(s){return s.active;});
+  var carousel=document.getElementById('previewCarousel');
+  carousel.querySelectorAll('.pc-slide').forEach(function(el){el.remove();});
+  active.forEach(function(s,i){
+    var slide=document.createElement('div');
+    slide.className='pc-slide'+(i===currentSlide?' visible':'');
+    slide.innerHTML='<img src="'+s.img+'" style="width:100%;height:100%;object-fit:cover"><div class="pc-overlay"><div class="pc-name">'+s.title+'</div><div class="pc-sub">'+s.sub+' · '+s.duration+'sn · '+s.targets.map(function(t){return ticoMap[t];}).join(' ')+'</div></div>';
+    carousel.insertBefore(slide,carousel.querySelector('.pc-nav.pc-next'));
+  });
+  document.getElementById('pcDots').innerHTML=active.map(function(_,i){return '<div class="pc-dot '+(i===currentSlide?'on':'')+'" onclick="goSlide('+i+')"></div>';}).join('');
+}
+function startSlideTimer(){
+  clearInterval(slideTimer);
+  var active=SLIDERS.filter(function(s){return s.active;});
+  if(!active.length)return;
+  slideTimer=setInterval(nextSlide,(active[currentSlide]?active[currentSlide].duration:5)*1000);
+}
+function nextSlide(){var a=SLIDERS.filter(function(s){return s.active;});currentSlide=(currentSlide+1)%a.length;renderCarousel();startSlideTimer();}
+function prevSlide(){var a=SLIDERS.filter(function(s){return s.active;});currentSlide=(currentSlide-1+a.length)%a.length;renderCarousel();startSlideTimer();}
+function goSlide(i){currentSlide=i;renderCarousel();startSlideTimer();}
+function filterSliders(f,el){
+  sliderFilter=f;
+  document.querySelectorAll('#sliderTargetFilter .btn').forEach(function(b){b.style.background='';b.style.color='';});
+  el.style.background='rgba(255,255,255,.08)';el.style.color='var(--text)';
+  renderSliderList();
+}
+function toggleSlider(id){
+  var s=SLIDERS.filter(function(x){return x.id===id;})[0];
+  s.active=!s.active;renderSliderList();renderCarousel();
+  showToast((s.active?'✅':'⛔')+' "'+s.title+'" '+(s.active?'yayında':'durduruldu'));
+}
+function deleteSlider(id){
+  if(!confirm('Slider silinsin mi?'))return;
+  SLIDERS=SLIDERS.filter(function(x){return x.id!==id;});
+  renderSliderList();renderCarousel();showToast('🗑 Slider silindi');
+}
+function editSlider(id){
+  var s=SLIDERS.filter(function(x){return x.id===id;})[0];
+  document.getElementById('sliderFormTitle').textContent='Slider Düzenle';
+  document.getElementById('sliderTitle').value=s.title;
+  document.getElementById('sliderSub').value=s.sub;
+  document.getElementById('sliderType').value=s.type;
+  document.getElementById('sliderDuration').value=s.duration;
+  document.getElementById('sliderImgUrl').value=s.img;
+  document.getElementById('chkKiosk').checked=s.targets.indexOf('kiosk')>-1;
+  document.getElementById('chkBoard').checked=s.targets.indexOf('board')>-1;
+  document.getElementById('chkLanding').checked=s.targets.indexOf('landing')>-1;
+  var uz=document.getElementById('uploadZone');
+  uz.style.backgroundImage='url('+s.img+')';uz.style.backgroundSize='cover';
+  document.getElementById('uzIcon').textContent='✅';
+  document.getElementById('sliderForm').scrollIntoView({behavior:'smooth'});
+}
+function saveSlider(){
+  var title=document.getElementById('sliderTitle').value.trim();
+  var sub=document.getElementById('sliderSub').value.trim();
+  var img=document.getElementById('sliderImgUrl').value.trim()||'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&q=80&auto=format&fit=crop';
+  if(!title){showToast('⚠️ Başlık zorunlu');return;}
+  var targets=[];
+  if(document.getElementById('chkKiosk').checked)targets.push('kiosk');
+  if(document.getElementById('chkBoard').checked)targets.push('board');
+  if(document.getElementById('chkLanding').checked)targets.push('landing');
+  if(!targets.length){showToast('⚠️ En az bir ekran seçin');return;}
+  SLIDERS.push({id:Date.now(),title:title,sub:sub,type:document.getElementById('sliderType').value,img:img,targets:targets,duration:parseInt(document.getElementById('sliderDuration').value)||5,active:true,order:SLIDERS.length+1});
+  renderSliderList();renderCarousel();resetSliderForm();
+  showToast('✅ Slider yayınlandı · '+targets.map(function(t){return ticoMap[t];}).join(' '));
+}
+function resetSliderForm(){
+  document.getElementById('sliderFormTitle').textContent='Yeni Slider Ekle';
+  ['sliderTitle','sliderSub','sliderImgUrl'].forEach(function(id){document.getElementById(id).value='';});
+  document.getElementById('sliderDuration').value='5';
+  document.getElementById('sliderType').value='promo';
+  document.getElementById('chkKiosk').checked=true;
+  document.getElementById('chkBoard').checked=true;
+  document.getElementById('chkLanding').checked=false;
+  var uz=document.getElementById('uploadZone');
+  uz.style.backgroundImage='';document.getElementById('uzIcon').textContent='🖼️';
+}
+function openSliderForm(){resetSliderForm();document.getElementById('sliderForm').scrollIntoView({behavior:'smooth'});}
+function triggerUpload(){document.getElementById('fileInput').click();}
+function handleFile(input){
+  if(!input.files[0])return;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    document.getElementById('sliderImgUrl').value=e.target.result;
+    var uz=document.getElementById('uploadZone');
+    uz.style.backgroundImage='url('+e.target.result+')';uz.style.backgroundSize='cover';
+    document.getElementById('uzIcon').textContent='✅';showToast('🖼️ Görsel yüklendi');
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+function handleDrop(e){
+  e.preventDefault();document.getElementById('uploadZone').classList.remove('drag-over');
+  var file=e.dataTransfer.files[0];
+  if(file&&file.type.startsWith('image/'))handleFile({files:[file]});
+}
+function previewUrlImage(){
+  var url=document.getElementById('sliderImgUrl').value.trim();
+  if(url.startsWith('http')){
+    var uz=document.getElementById('uploadZone');
+    uz.style.backgroundImage='url('+url+')';uz.style.backgroundSize='cover';
+    document.getElementById('uzIcon').textContent='🔗';
+  }
+}
 
 // ── PANEL NAV ──
-const PANEL_TITLES = {
-  users:'Kullanıcı Yönetimi', menu:'Menü Yönetimi', tables:'Masa & QR',
-  barcode:'Barkod', integrations:'Pazaryeri API', courier:'Kurye API',
-  printer:'Yazıcı Ayarları', efatura:'e-Fatura & POS', erp:'ERP / B2B / B2C',
-  reports:'Raporlama'
-};
-
-function switchPanel(id, el) {
-  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.sb-item').forEach(b=>b.classList.remove('active'));
+var PANEL_TITLES={users:'Kullanıcı Yönetimi',menu:'Menü Yönetimi',tables:'Masa & QR',barcode:'Barkod',integrations:'Pazaryeri API',courier:'Kurye API',printer:'Yazıcı',efatura:'e-Fatura & POS',erp:'ERP / B2B / B2C',reports:'Raporlama',kiosk:'Kiosk Yönetimi',menuboard:'Menü Board',sliders:'Slider & Kampanya'};
+function switchPanel(id,el){
+  document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});
+  document.querySelectorAll('.sb-item').forEach(function(b){b.classList.remove('active');});
   document.getElementById('panel-'+id).classList.add('active');
   el.classList.add('active');
-  document.getElementById('topTitle').textContent = PANEL_TITLES[id]||id;
+  document.getElementById('topTitle').textContent=PANEL_TITLES[id]||id;
+  if(id==='kiosk')initKiosk();
+  if(id==='menuboard')initMenuBoard();
+  if(id==='sliders')initSliders();
 }
 
-// ── TOAST ──
-function showToast(msg) {
-  const t=document.getElementById('toast');
-  t.textContent=msg; t.classList.add('show');
-  clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),3000);
+// ── UTILS ──
+function showToast(msg){
+  var t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(t._t);t._t=setTimeout(function(){t.classList.remove('show');},3200);
 }
-
-// ── CLOCK ──
-setInterval(()=>{
-  document.getElementById('clock').textContent =
-    new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+setInterval(function(){
+  var c=document.getElementById('clock');
+  if(c)c.textContent=new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
 },1000);
-
-function logout() { window.location.href='ops-login.html'; }
-function generateBarcode() { document.getElementById('barcodePreview').textContent = '||| ' + (document.getElementById('barcodeContent').value||'...') + ' |||'; }
-
-// ── INIT ──
-renderUsers();
-renderMenu();
-renderMasalar();
-renderIntGrid(INTEGRATIONS,'intGrid');
-renderIntGrid(COURIERS,'courierGrid');
-renderIntGrid(ERP_LIST,'erpGrid');
-renderReportCharts();
 </script>
 </body>
 </html>

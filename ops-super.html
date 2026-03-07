@@ -1,6 +1,20 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
+<script>
+(function(){
+  var role = sessionStorage.getItem('atom_role');
+  var user = sessionStorage.getItem('atom_user');
+  var ALLOWED_ROLES = ['super', 'admin'];
+  var ALLOWED_USERS = ['isletme', 'admin'];
+  if(!role || ALLOWED_ROLES.indexOf(role) === -1) {
+    // Not logged in or wrong role
+    sessionStorage.setItem('atom_redirect_msg', 'Bu sayfaya erişmek için 📊 İşletme Paneli girişi yapmalısınız.');
+    window.location.replace('ops-login.html');
+  }
+})();
+</script>
+
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>ATOM OPS · İşletme</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Figtree:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -937,6 +951,13 @@ setInterval(()=>{
 renderDash(); renderOrders(); renderMarkets(); renderCloud(); renderStock();
 renderDelivery(); renderCampaigns(); renderCustomers(); renderReservations();
 renderMasaPay(); renderShift(); renderNotifs();
+
+function atomLogout() {
+  sessionStorage.removeItem('atom_role');
+  sessionStorage.removeItem('atom_user');
+  sessionStorage.removeItem('atom_label');
+  window.location.href = 'ops-login.html';
+}
 </script>
 </body>
 </html>
