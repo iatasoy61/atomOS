@@ -1244,8 +1244,8 @@ function sendGarson(){
   var masa = selectedMasa || '7';
   var notEl = document.getElementById('garsonNot');
   var not = notEl ? notEl.value : '';
-  var msg = encodeURIComponent('🛎 GARSON ÇAĞRI\nMasa: ' + masa + (not ? '\nNot: ' + not : ''));
-  window.open('https://wa.me/' + GARSON_WA + '?text=' + msg, '_blank');
+  var waMsg = '🛎 GARSON ÇAĞRI\nMasa: ' + masa + (not ? '\nNot: ' + not : '');
+  window.open('https://wa.me/' + GARSON_WA + '?text=' + encodeURIComponent(waMsg), '_blank');
   closeQA('garson');
   var toastMasa = document.getElementById('grToastMasa');
   var toast = document.getElementById('grToast');
