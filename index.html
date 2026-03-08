@@ -234,7 +234,7 @@ color:rgba(255,255,255,.3);margin-bottom:3px}
 .map-embed{width:100%;height:190px;border-radius:14px;
 border:1px solid rgba(255,255,255,.08);overflow:hidden;margin-top:6px}
 .map-embed iframe{width:100%;height:100%;border:none;filter:grayscale(20%) brightness(.85)}
-/* Franchising */
+/* Franchise */
 .fr-hero{background:linear-gradient(135deg,rgba(232,57,14,.12),rgba(232,57,14,.04));
 border:1px solid rgba(232,57,14,.2);border-radius:16px;padding:22px;margin-bottom:20px;text-align:center}
 .fr-hero-title{font-family:'Cormorant Garamond';font-size:22px;font-weight:600;color:#fff;margin-bottom:6px}
@@ -370,9 +370,9 @@ animation:scrollA 2s ease infinite}
   </div>
   <div class="nav-right">
     <a class="nav-link" href="#" onclick="openModal('hakkimizda');return false;">Hakkımızda</a>
-    <a class="nav-link" href="#" onclick="openModal('kampanyalar');return false;">Kampanyalar</a>
     <a class="nav-link" href="#" onclick="openModal('iletisim');return false;">İletişim</a>
-    <a class="nav-link" href="#" onclick="openModal('franchising');return false;">Franchising</a>
+    <a class="nav-link" href="#" onclick="openModal('kampanyalar');return false;">Kampanyalar</a>
+    <a class="nav-link" href="#" onclick="openModal('franchising');return false;">Franchise</a>
     <div class="nav-pill"><div class="nav-pdot"></div><span id="navSt">Acik</span></div>
   </div>
 </nav>
@@ -605,7 +605,6 @@ animation:scrollA 2s ease infinite}
     <div class="modal-title">KAMPANYALAR</div>
     <div class="modal-sub">Sadakat &middot; Özel Teklifler</div>
     <div class="kamp-card">
-      <div class="kamp-ico">🪙</div>
       <div>
         <div class="kamp-title">Para Puan Sistemi</div>
         <div class="kamp-desc">Her siparişinizde puan kazanın. Biriken puanlarınızı bir sonraki siparişinizde indirim olarak kullanın. Ne kadar çok sipariş verirseniz, o kadar çok kazanırsınız.</div>
@@ -613,7 +612,6 @@ animation:scrollA 2s ease infinite}
       </div>
     </div>
     <div class="kamp-card">
-      <div class="kamp-ico">📱</div>
       <div>
         <div class="kamp-title">2. Online Siparişte İndirim</div>
         <div class="kamp-desc">İlk online siparişinizin ardından ikinci siparişinizde özel indirim fırsatı sizi bekliyor. Online siparişin keyfini çıkarın, avantajını yaşayın.</div>
@@ -621,7 +619,6 @@ animation:scrollA 2s ease infinite}
       </div>
     </div>
     <div class="kamp-card">
-      <div class="kamp-ico">🎁</div>
       <div>
         <div class="kamp-title">10. Siparişte İkram</div>
         <div class="kamp-desc">10 sipariş verdiniz mi? Tatlı veya kahve bizden! Sadakatinizin karşılığını her zaman veriyoruz.</div>
@@ -629,7 +626,6 @@ animation:scrollA 2s ease infinite}
       </div>
     </div>
     <div class="kamp-card">
-      <div class="kamp-ico">👥</div>
       <div>
         <div class="kamp-title">Arkadaşını Getir</div>
         <div class="kamp-desc">Bir arkadaşınızı ATOM'a davet edin. İlk siparişini verdiğinde siz de hediye puan kazanın.</div>
@@ -637,7 +633,6 @@ animation:scrollA 2s ease infinite}
       </div>
     </div>
     <div class="kamp-card">
-      <div class="kamp-ico">🎂</div>
       <div>
         <div class="kamp-title">Doğum Günü Sürprizi</div>
         <div class="kamp-desc">Doğum gününüzde sipariş verin, özel bir sürprizle kutlayalım. Çünkü her müşterimiz bizim için özel.</div>
@@ -654,19 +649,15 @@ animation:scrollA 2s ease infinite}
     <div class="modal-title">İLETİŞİM</div>
     <div class="modal-sub">Bize Ulaşın</div>
     <div class="il-row">
-      <div class="il-ico">📞</div>
       <div><div class="il-label">Telefon</div><div class="il-val"><a href="tel:02163097275">(0216) 309 72 75</a></div></div>
     </div>
     <div class="il-row">
-      <div class="il-ico">💬</div>
       <div><div class="il-label">WhatsApp</div><div class="il-val"><a href="https://wa.me/905359777275">0535 977 72 75</a></div></div>
     </div>
     <div class="il-row">
-      <div class="il-ico">✉️</div>
-      <div><div class="il-label">E-posta</div><div class="il-val"><a href="mailto:atomkumpir@hotmail.com">atomkumpir@hotmail.com</a></div></div>
+      <div><div class="il-label">E-posta</div><div class="il-val"><a href="/cdn-cgi/l/email-protection#5031243f3d3b253d20392210383f243d31393c7e333f3d"><span class="__cf_email__" data-cfemail="fe9f8a9193958b938e978cbe96918a939f9792d09d9193">[email&#160;protected]</span></a></div></div>
     </div>
     <div class="il-row">
-      <div class="il-ico">📍</div>
       <div><div class="il-label">Adres</div><div class="il-val">Soğanlık Yeni Mah. Atatürk Cd. No:9/A<br>34880 Kartal / İstanbul</div></div>
     </div>
     <div class="modal-divider"></div>
@@ -691,19 +682,19 @@ animation:scrollA 2s ease infinite}
 <div class="modal-overlay" id="modal-franchising">
   <div class="modal">
     <button class="modal-close" onclick="closeModal('franchising')">&#10005;</button>
-    <div class="modal-title">FRANCHİSİNG</div>
+    <div class="modal-title">FRANCHİSE</div>
     <div class="modal-sub">Yeni Nesil İş Modeli</div>
     <div class="fr-hero">
       <div class="fr-hero-title">Tabela bedeli yok. Ciro primi yok.</div>
       <div class="fr-hero-sub">Geleneksel franchise anlayışını yıkıyoruz. Şeffaf, adil ve sürdürülebilir bir iş ortaklığıyla kendi işinizi kurun.</div>
     </div>
     <div class="fr-cards">
-      <div class="fr-card"><div class="fr-card-ico">🚫</div><div class="fr-card-title">Tabela Bedeli Yok</div><div class="fr-card-desc">Gizli maliyet yok, sürpriz fatura yok.</div></div>
-      <div class="fr-card"><div class="fr-card-ico">📊</div><div class="fr-card-title">Ciro Primi Yok</div><div class="fr-card-desc">Kazandığınız sizin, ortaklık şeffaf.</div></div>
-      <div class="fr-card"><div class="fr-card-ico">🍔</div><div class="fr-card-title">Kanıtlanmış Lezzet</div><div class="fr-card-desc">4.8★ puanlı güçlü marka desteği.</div></div>
-      <div class="fr-card"><div class="fr-card-ico">🤝</div><div class="fr-card-title">Tam Destek</div><div class="fr-card-desc">Eğitim, tedarik ve operasyon desteği.</div></div>
-      <div class="fr-card"><div class="fr-card-ico">⚡</div><div class="fr-card-title">Hızlı Kurulum</div><div class="fr-card-desc">Kısa sürede açılışa hazır hale gelin.</div></div>
-      <div class="fr-card"><div class="fr-card-ico">📱</div><div class="fr-card-title">Dijital Altyapı</div><div class="fr-card-desc">Online sipariş sistemi hazır gelir.</div></div>
+      <div class="fr-card"><div class="fr-card-title">Tabela Bedeli Yok</div><div class="fr-card-desc">Gizli maliyet yok, sürpriz fatura yok.</div></div>
+      <div class="fr-card"><div class="fr-card-title">Ciro Primi Yok</div><div class="fr-card-desc">Kazandığınız sizin, ortaklık şeffaf.</div></div>
+      <div class="fr-card"><div class="fr-card-title">Kanıtlanmış Lezzet</div><div class="fr-card-desc">4.8★ puanlı güçlü marka desteği.</div></div>
+      <div class="fr-card"><div class="fr-card-title">Tam Destek</div><div class="fr-card-desc">Eğitim, tedarik ve operasyon desteği.</div></div>
+      <div class="fr-card"><div class="fr-card-title">Hızlı Kurulum</div><div class="fr-card-desc">Kısa sürede açılışa hazır hale gelin.</div></div>
+      <div class="fr-card"><div class="fr-card-title">Dijital Altyapı</div><div class="fr-card-desc">Online sipariş sistemi hazır gelir.</div></div>
     </div>
     <a class="fr-cta" href="https://wa.me/905428973446?text=Atom%20Markas%C4%B1%20Teknoloji%20Altyap%C4%B1s%C4%B1%20ve%20i%C5%9F%20modeli%20hakk%C4%B1nda%20detaylar%C4%B1%20g%C3%B6r%C3%BC%C5%9Fmek%20istiyorum" target="_blank" rel="noopener">
       💬 &nbsp; WhatsApp ile Bilgi Al
@@ -713,7 +704,7 @@ animation:scrollA 2s ease infinite}
 
 <div class="scroll-hint"><div class="sline"></div><span>Kesfet</span></div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 (function(){
 
 /* ── CURSOR ── */
@@ -920,10 +911,8 @@ var ISLETMECI_WA = "905428973446";
     // localStorage broadcast → garson.html dinliyor
     localStorage.setItem('atom_broadcast', JSON.stringify({ type:'garson', masa:masa, time:Date.now() }));
     // WhatsApp yedek
-    var msg = encodeURIComponent('🔔 GARSON ÇAĞRISI\nMasa ' + masa + ' garson istiyor.');
-    window.open('https://wa.me/' + GARSON_WA + '?text=' + msg, '_blank');
-    setTimeout(function() {
-      st.className = 'gv-status sent'; st.textContent = '✓ Garson yolda';
+    var msg = encodeURIComponent('🔔 Garson çağrısı · Masa ' + masa + ' · ATOM Kumpir');
+    setTimeout(function(){
       showGvNotify('🔔', 'Garson çağrıldı', 'Masa ' + masa + ' · Az sonra geliyor');
       setTimeout(function(){ st.textContent = ''; btn.disabled = false; }, 8000);
     }, 1000);
