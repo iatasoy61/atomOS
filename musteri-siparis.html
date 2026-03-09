@@ -124,8 +124,9 @@ body{background:#111;color:#fff;font-family:'Figtree',sans-serif;min-height:100v
 
 /* ── HERO ── */
 .hero{position:relative;height:220px;overflow:hidden;cursor:pointer}
-.hero-track{display:flex;height:100%;transition:transform .5s cubic-bezier(.77,0,.18,1)}
-.hero-slide{min-width:100%;height:100%;flex-shrink:0}
+.hero-track{position:relative;width:100%;height:100%}
+.hero-slide{position:absolute;inset:0;opacity:0;transition:opacity .5s ease}
+.hero-slide.active{opacity:1}
 .hero-slide img{width:100%;height:100%;object-fit:cover;display:block}
 .hero-dots{position:absolute;bottom:52px;left:50%;transform:translateX(-50%);display:flex;gap:5px;z-index:5}
 .hero-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.4);transition:.3s}
@@ -373,7 +374,7 @@ body{background:#111;color:#fff;font-family:'Figtree',sans-serif;min-height:100v
 <!-- ══ HERO ══ -->
 <div class="hero" id="heroSection">
   <div class="hero-track" id="heroTrack">
-    <div class="hero-slide"><img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=900&q=85&auto=format&fit=crop" alt="Burger"></div>
+    <div class="hero-slide active"><img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=900&q=85&auto=format&fit=crop" alt="Burger"></div>
     <div class="hero-slide"><img src="https://images.unsplash.com/photo-1513442542250-854d436a73f2?w=900&q=85&auto=format&fit=crop" alt="Waffle"></div>
     <div class="hero-slide"><img src="https://images.unsplash.com/photo-1571407970349-bc81e7e96d47?w=900&q=85&auto=format&fit=crop" alt="Pizza"></div>
     <div class="hero-slide"><img src="https://images.unsplash.com/photo-1553979459-d2229ba7433b?w=900&q=85&auto=format&fit=crop" alt="Kumpir"></div>
@@ -393,7 +394,7 @@ body{background:#111;color:#fff;font-family:'Figtree',sans-serif;min-height:100v
   <button class="pc pc-vale" onclick="openQA('vale')">🚗 Vale Çağır</button>
   <button class="pc pc-takip" onclick="openQA('takip')">📦 Sipariş Takip</button>
   <button class="pc pc-ode" onclick="openQA('ode')">💳 Temassız Öde</button>
-  <button class="pc pc-loyalty" onclick="openMemberLogin()" style="grid-column:1/-1">⭐ Üye Olanlar Her Siparişinde İndirim Kazanıyor!</button>
+  <button class="pc pc-loyalty" onclick="openQA('loyalty')" style="grid-column:1/-1">⭐ Üye Olanlar Her Siparişinde İndirim Kazanıyor!</button>
 </div>
 
 <!-- ══ CATS ══ -->
@@ -950,7 +951,10 @@ body{background:#111;color:#fff;font-family:'Figtree',sans-serif;min-height:100v
 .loy-perks-wrap{padding:20px 0 4px}
 .loy-section-head{display:flex;align-items:center;gap:8px;padding:0 20px;margin-bottom:12px}
 .loy-section-head-line{flex:1;height:1px;background:rgba(255,255,255,.07)}
-.loy-section-head span{font-size:9px;font-weight:800;color:rgba(255,255,255,.25);letter-spacing:1.5px;white-space:nowrap}
+.loy-section-head span{font-size:9px;font-weight:800;color:rgba(250,204,21,.7);letter-spacing:1.5px;white-space:nowrap}
+#loyForm strong{color:#FACC15;-webkit-text-fill-color:#FACC15}
+#loyForm .loy-perk-title{color:#fff;-webkit-text-fill-color:#fff}
+#loyForm .loy-perk-sub{color:rgba(255,255,255,.5);-webkit-text-fill-color:rgba(255,255,255,.5)}
 .loy-perks-scroll{display:flex;gap:10px;overflow-x:auto;padding:4px 20px 12px;scrollbar-width:none}
 .loy-perks-scroll::-webkit-scrollbar{display:none}
 .loy-perk-card{flex-shrink:0;width:105px;background:linear-gradient(160deg,rgba(255,255,255,.07),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:16px 10px 13px;text-align:center;position:relative;overflow:hidden;animation:loy-card-in .45s cubic-bezier(.34,1.3,.64,1) both;transition:transform .2s}
@@ -964,7 +968,7 @@ body{background:#111;color:#fff;font-family:'Figtree',sans-serif;min-height:100v
 .loy-perk-card:nth-child(4) .loy-perk-emoji-wrap{background:rgba(244,114,182,.12)}
 .loy-perk-card:nth-child(5) .loy-perk-emoji-wrap{background:rgba(56,189,248,.12)}
 .loy-perk-title{font-size:11px;font-weight:800;color:#fff;line-height:1.3;margin-bottom:4px}
-.loy-perk-sub{font-size:9.5px;color:rgba(255,255,255,.35);line-height:1.4}
+.loy-perk-sub{font-size:9.5px;color:rgba(255,255,255,.6);line-height:1.4}
 .loy-form-section{padding:4px 20px 0}
 .loy-input-wrap{position:relative;margin-bottom:10px}
 .loy-input-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:15px;pointer-events:none}
@@ -1387,34 +1391,32 @@ if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded'
 window.addEventListener('load', function(){ if(!document.getElementById('productList').innerHTML) renderMenu(); });
 
 // ── HERO SLIDER ──
+var _hSlides=[
+  {tag:'🔥 Günün Önerisi',title:'El Yapımı<br>Smash Burger',sub:'Taze · Sıcak · Lezzetli'},
+  {tag:'🧇 Öne Çıkan',title:'Tatlı<br>Waffle',sub:'Ev Yapımı · Sıcak · Taze'},
+  {tag:'🍕 Favoriler',title:'Çıtır<br>Pizza',sub:'Odun Fırını · Bol Malzeme'},
+  {tag:'🥔 Klasik Lezzet',title:'ATOM<br>Kumpir',sub:'Özel Sos · Tam Doyum'}
+];
+var _hCur=0;
+function _hGoTo(n){
+  var s=document.getElementById('heroTrack').querySelectorAll('.hero-slide');
+  s[_hCur].classList.remove('active');
+  _hCur=n;
+  s[_hCur].classList.add('active');
+  document.querySelectorAll('.hero-dot').forEach(function(d,i){d.classList.toggle('active',i===_hCur)});
+  document.getElementById('heroTag').textContent=_hSlides[_hCur].tag;
+  document.getElementById('heroTitle').innerHTML=_hSlides[_hCur].title;
+  document.getElementById('heroSub').textContent=_hSlides[_hCur].sub;
+}
 (function(){
-  var slides=[
-    {img:'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=900&q=85&auto=format&fit=crop',tag:'🔥 Günün Önerisi',title:'El Yapımı<br>Smash Burger',sub:'Taze · Sıcak · Lezzetli'},
-    {img:'https://images.unsplash.com/photo-1513442542250-854d436a73f2?w=900&q=85&auto=format&fit=crop',tag:'🧇 Öne Çıkan',title:'Tatlı<br>Waffle',sub:'Ev Yapımı · Sıcak · Taze'},
-    {img:'https://images.unsplash.com/photo-1571407970349-bc81e7e96d47?w=900&q=85&auto=format&fit=crop',tag:'🍕 Favoriler',title:'Çıtır<br>Pizza',sub:'Odun Fırını · Bol Malzeme'},
-    {img:'https://images.unsplash.com/photo-1553979459-d2229ba7433b?w=900&q=85&auto=format&fit=crop',tag:'🥔 Klasik Lezzet',title:'ATOM<br>Kumpir',sub:'Özel Sos · Tam Doyum'}
-  ];
-  var cur=0,track=document.getElementById('heroTrack'),dotsEl=document.getElementById('heroDots');
-  var tagEl=document.getElementById('heroTag'),titleEl=document.getElementById('heroTitle'),subEl=document.getElementById('heroSub');
-
-  // build dots
-  slides.forEach(function(_,i){
-    var d=document.createElement('span');
+  var d,i,el=document.getElementById('heroDots');
+  for(i=0;i<_hSlides.length;i++){
+    d=document.createElement('span');
     d.className='hero-dot'+(i===0?' active':'');
-    d.onclick=function(){goTo(i)};
-    dotsEl.appendChild(d);
-  });
-
-  function goTo(n){
-    cur=n;
-    track.style.transform='translateX(-'+cur*100+'%)';
-    document.querySelectorAll('.hero-dot').forEach(function(d,i){d.classList.toggle('active',i===cur)});
-    tagEl.textContent=slides[cur].tag;
-    titleEl.innerHTML=slides[cur].title;
-    subEl.textContent=slides[cur].sub;
+    (function(idx){d.onclick=function(){_hGoTo(idx)};})(i);
+    el.appendChild(d);
   }
-
-  setInterval(function(){goTo((cur+1)%slides.length)},3000);
+  setInterval(function(){_hGoTo((_hCur+1)%_hSlides.length)},3000);
 })();
 // Show NFC after closed check (only if open)
 setTimeout(()=>{if(isBusinessOpen)document.getElementById('nfcOvl').classList.add('show')},600);
@@ -1591,44 +1593,80 @@ function sendVale(){
         <div class="loy-banner-bg"></div>
         <div class="loy-banner-coin">🪙</div>
         <div class="loy-badge">🏆 ATOM CLUB</div>
-        <h2>Para Puan<br>Kazan!</h2>
-        <p>Her siparişinde puan biriktir,<br>avantajlardan yararlan.</p>
+        <h2>Üye Ol,<br>Kazan!</h2>
+        <p>Her siparişinde indirim ve ödüller<br>seni bekliyor — üstelik ücretsiz!</p>
       </div>
 
       <div id="loyForm">
+
+        <!-- KAMPANYA AÇIKLAMASI -->
+        <div style="padding:0 18px;margin-top:18px">
+          <div class="loy-section-head" style="margin-bottom:16px">
+            <div class="loy-section-head-line"></div>
+            <span>NASIL ÇALIŞIR?</span>
+            <div class="loy-section-head-line"></div>
+          </div>
+
+          <!-- Adım 1 -->
+          <div style="display:flex;gap:14px;align-items:flex-start;margin-bottom:16px;background:rgba(250,204,21,.05);border:1px solid rgba(250,204,21,.12);border-radius:14px;padding:14px">
+            <div style="width:38px;height:38px;border-radius:50%;background:rgba(250,204,21,.15);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">1️⃣</div>
+            <div>
+              <div style="font-size:14px;font-weight:800;color:#FACC15;margin-bottom:3px">Üye Ol — Hemen Puan Kazan</div>
+              <div style="font-size:12px;color:rgba(255,255,255,.6);line-height:1.6">Formu doldurup üye olduğun anda hesabına <span style="color:#FACC15;-webkit-text-fill-color:#FACC15;font-weight:700">50 Hoş Geldin Puanı</span> yüklenir. Hiçbir harcama şartı yok.</div>
+            </div>
+          </div>
+
+          <!-- Adım 2 -->
+          <div style="display:flex;gap:14px;align-items:flex-start;margin-bottom:16px;background:rgba(250,204,21,.05);border:1px solid rgba(250,204,21,.12);border-radius:14px;padding:14px">
+            <div style="width:38px;height:38px;border-radius:50%;background:rgba(250,204,21,.15);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">2️⃣</div>
+            <div>
+              <div style="font-size:14px;font-weight:800;color:#FACC15;margin-bottom:3px">Her Siparişte %10 Puan</div>
+              <div style="font-size:12px;color:rgba(255,255,255,.6);line-height:1.6">Sipariş tutarının <span style="color:#FACC15;-webkit-text-fill-color:#FACC15;font-weight:700">%10'u puan</span> olarak hesabına işlenir. 150₺ harcadın → 15 puan kazandın. Puanlar bir sonraki siparişte nakit gibi kullanılır.</div>
+            </div>
+          </div>
+
+          <!-- Adım 3 -->
+          <div style="display:flex;gap:14px;align-items:flex-start;margin-bottom:16px;background:rgba(250,204,21,.05);border:1px solid rgba(250,204,21,.12);border-radius:14px;padding:14px">
+            <div style="width:38px;height:38px;border-radius:50%;background:rgba(250,204,21,.15);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">3️⃣</div>
+            <div>
+              <div style="font-size:14px;font-weight:800;color:#FACC15;margin-bottom:3px">Puanlarını Harca</div>
+              <div style="font-size:12px;color:rgba(255,255,255,.6);line-height:1.6">Birikmiş puanlarını sonraki siparişinde <span style="color:#FACC15;-webkit-text-fill-color:#FACC15;font-weight:700">indirim olarak</span> kullanabilirsin. 1 Puan = 1₺ değerindedir.</div>
+            </div>
+          </div>
+        </div>
 
         <!-- AVANTAJ KARTLARI -->
         <div class="loy-perks-wrap">
           <div class="loy-section-head">
             <div class="loy-section-head-line"></div>
-            <span>ÜYELİK AVANTAJLARI</span>
+            <span>ÖZEL AVANTAJLAR</span>
             <div class="loy-section-head-line"></div>
           </div>
           <div class="loy-perks-scroll">
             <div class="loy-perk-card">
-              <div class="loy-perk-emoji-wrap">💰</div>
-              <div class="loy-perk-title">500₺+ Sipariş</div>
-              <div class="loy-perk-sub">Her siparişte puan kazan</div>
-            </div>
-            <div class="loy-perk-card">
               <div class="loy-perk-emoji-wrap">🎁</div>
               <div class="loy-perk-title">10. Sipariş</div>
-              <div class="loy-perk-sub">Sürpriz ikram hediye!</div>
+              <div class="loy-perk-sub">Bedava ürün sürprizi!</div>
             </div>
             <div class="loy-perk-card">
               <div class="loy-perk-emoji-wrap">👫</div>
               <div class="loy-perk-title">Arkadaşını Getir</div>
-              <div class="loy-perk-sub">İkinize özel indirim</div>
+              <div class="loy-perk-sub">İkinize %15 indirim</div>
             </div>
             <div class="loy-perk-card">
               <div class="loy-perk-emoji-wrap">🎂</div>
               <div class="loy-perk-title">Doğum Günü</div>
-              <div class="loy-perk-sub">Sana sürpriz hediye</div>
+              <div class="loy-perk-sub">Sana özel sürpriz</div>
             </div>
             <div class="loy-perk-card">
               <div class="loy-perk-emoji-wrap">📱</div>
               <div class="loy-perk-title">Online Sipariş</div>
-              <div class="loy-perk-sub">Ekstra puan kazan</div>
+              <div class="loy-perk-sub">+%5 ekstra puan</div>
+            </div>
+            <div class="loy-perk-card">
+              <div class="loy-perk-emoji-wrap">📸</div>
+              <div class="loy-perk-title">Paylaş & Kazan</div>
+              <div class="loy-perk-sub">IG'de etiketle +25 puan</div>
             </div>
           </div>
         </div>
